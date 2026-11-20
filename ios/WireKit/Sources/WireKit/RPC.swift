@@ -194,6 +194,36 @@ public struct WeatherDay: Equatable, Sendable {
     }
 }
 
+public struct WeatherHour: Equatable, Sendable {
+    public var temp: Double, code: Int, precip: Int, night: Bool
+    public init(temp: Double, code: Int, precip: Int, night: Bool) {
+        (self.temp, self.code, self.precip, self.night) = (temp, code, precip, night)
+    }
+}
+
+/// Consecutive hours from `hour`, the local hour (0–23) that contains now.
+public struct WeatherHours: Equatable, Sendable {
+    public var hour: Int, hours: [WeatherHour]
+    public init(hour: Int, hours: [WeatherHour]) { (self.hour, self.hours) = (hour, hours) }
+}
+
+/// `days [‖ hours]`: hours 0–24, absent is 0. nil for anything else.
+public func weatherArgs(_ a: Data) -> (days: Int, hours: Int)? {
+    let b = [UInt8](a)
+    guard (1...2).contains(b.count), b.count == 1 || b[1] <= 24 else { return nil }
+    return (Int(b[0]), b.count == 2 ? Int(b[1]) : 0)
+}
+
+/// `2 ‖ hour ‖ n × (temp:i8 ‖ code ‖ precip)`, at most `limit` hours and never over 24; precip's bit 7 is night.
+/// nil when that leaves no hour.
+public func weatherRecord(_ w: WeatherHours, limit: Int) -> Data? {
+    let hours = w.hours.prefix(min(limit, 24))
+    guard !hours.isEmpty else { return nil }
+    return Data([2, UInt8(clamping: w.hour)]) + hours.flatMap {
+        [i8(Int($0.temp.rounded())), UInt8(clamping: $0.code), UInt8(min(max($0.precip, 0), 100)) | ($0.night ? 0x80 : 0)]
+    }
+}
+
 /// `0 ‖ temp:i16 ‖ code ‖ wind ‖ humidity ‖ age`
 public func weatherRecord(_ w: WeatherNow) -> Data {
     var d = Data([0])
@@ -359,7 +389,7 @@ public func notificationRecord(_ n: PhoneNotification, show: Bool) -> Data {
     var notificationsAvailable: Bool { get }
     func calendar(fromDay: Int, days: Int) async throws -> [CalendarEvent]
     func location() async throws -> LocationFix
-    func weather() async throws -> (now: WeatherNow, days: [WeatherDay])
+    func weather() async throws -> (now: WeatherNow, hours: WeatherHours?, days: [WeatherDay])
     /// http.get and http.request, with the user's headers and the cookie jar of (package, host).
     func http(_ call: HTTPCall, package: String) async throws -> (code: Int, body: Data)
     /// Parts, stores: one per phone.
@@ -452,10 +482,11 @@ public func answer(_ message: Data, package: String?, host: any RPCHost,
         try permit("location")
         return [locationRecord(try await host.location())]
     case RPCMethod.weather:
-        guard let days = a.first else { throw RPCStatus.badRequest }
+        guard let (days, hours) = weatherArgs(args) else { throw RPCStatus.badRequest }
         try permit("weather")
         let w = try await host.weather()
-        return [weatherRecord(w.now)] + w.days.prefix(min(Int(days), 7)).map { weatherRecord($0) }
+        return [weatherRecord(w.now)] + [w.hours.flatMap { weatherRecord($0, limit: hours) }].compactMap { $0 }
+            + w.days.prefix(min(days, 7)).map { weatherRecord($0) }
     case RPCMethod.http:
         guard args.count <= 123, let url = httpsURL(args) else { throw RPCStatus.badRequest }
         let call = HTTPCall(method: "GET", url: url)
@@ -551,7 +582,7 @@ public struct RefreshJob: Codable, Equatable, Sendable {
 }
 
 /// `job:u8 ‖ minutes:u16 ‖ kind:u8 ‖ target:u8 ‖ spec`: job 0–3, minutes clamped to 15…1440; spec http.request's
-/// joined payload (kind 0), weather's `days` (1), calendar.events' args (2); target 0 the widget (web requests
+/// joined payload (kind 0), weather's args (1), calendar.events' args (2); target 0 the widget (web requests
 /// only), 1 the start blob. nil for anything else.
 public func parseJob(_ d: Data) -> RefreshJob? {
     let b = [UInt8](d)
@@ -560,7 +591,7 @@ public func parseJob(_ d: Data) -> RefreshJob? {
     let spec = Data(b[5...])
     switch kind {
     case .http: guard parseHTTPCall(spec) != nil else { return nil }
-    case .weather: guard spec.count == 1 else { return nil }
+    case .weather: guard weatherArgs(spec) != nil else { return nil }
     case .calendar: guard spec.count == 3 else { return nil }
     }
     return RefreshJob(id: Int(b[0]), minutes: min(max(Int(d.le(UInt16.self, at: 1)), 15), 1440), kind: kind, target: target,

@@ -63,7 +63,7 @@
     <string name="faces_change_failed">घड़ी पर फ़ेस बदले नहीं जा सके: %1$s</string>
     <string name="delete_face_title">%1$s हटाएँ?</string>
     <string name="delete_face_text">यह घड़ी से हट जाएगा। वापस पाने के लिए इसे फिर से इंस्टॉल करें।</string>
-    <string name="watch_faces_count">वॉच फ़ेस · %1$d</string>
+    <string name="watch_faces_count">वॉच फ़ेस · %1$s</string>
     <string name="show_on_watch">घड़ी पर दिखाएँ</string>
     <string name="reading_watch">घड़ी पढ़ी जा रही है…</string>
     <string name="connect_to_see_faces">घड़ी के फ़ेस देखने के लिए कनेक्ट करें।</string>

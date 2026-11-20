@@ -63,7 +63,7 @@
     <string name="faces_change_failed">No se pudieron cambiar las esferas del reloj: %1$s</string>
     <string name="delete_face_title">¿Eliminar %1$s?</string>
     <string name="delete_face_text">Se borra del reloj. Para recuperarla, vuelve a instalarla.</string>
-    <string name="watch_faces_count">Esferas · %1$d</string>
+    <string name="watch_faces_count">Esferas · %1$s</string>
     <string name="show_on_watch">Mostrar en el reloj</string>
     <string name="reading_watch">Leyendo el reloj…</string>
     <string name="connect_to_see_faces">Conéctate para ver las esferas del reloj.</string>

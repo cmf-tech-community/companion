@@ -69,7 +69,7 @@
     <string name="faces_change_failed">Couldn\'t change the faces on the watch: %1$s</string>
     <string name="delete_face_title">Delete %1$s?</string>
     <string name="delete_face_text">It goes from the watch. To get it back, install it again.</string>
-    <string name="watch_faces_count">Watch faces · %1$d</string>
+    <string name="watch_faces_count">Watch faces · %1$s</string>
     <string name="show_on_watch">Show on the watch</string>
     <string name="reading_watch">Reading the watch…</string>
     <string name="connect_to_see_faces">Connect to see the faces on the watch.</string>
