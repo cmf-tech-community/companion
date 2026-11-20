@@ -205,10 +205,13 @@ is in the foreground or when asked and allowed; no fix at all: `UNAVAILABLE`.
 
 ### `0x30 weather`
 
-Args: `days:u8`, 0–7: daily records for days 0…days−1, after the current one. Records (`weather` vectors):
+Args: `days:u8 [‖ hours:u8]`. `days` 0–7: daily records for days 0…days−1. `hours` 0–24, absent is 0: the hourly
+record with that many hours from now. `hours` over 24 or a third byte: `BAD_REQUEST` (`weather_args` vectors).
+Records, in this order (`weather` vectors):
 
 ```
 current: 0:u8 ‖ temp:i16 ‖ code:u8 ‖ wind:u8 ‖ humidity:u8 ‖ age:u8
+hourly:  2:u8 ‖ hour:u8 ‖ n × (temp:i8 ‖ code:u8 ‖ precip:u8)
 daily:   1:u8 ‖ day:i8 ‖ min:i8 ‖ max:i8 ‖ code:u8 ‖ precip:u8
 ```
 
@@ -217,6 +220,15 @@ data was fetched (capped at 255), `day` 0 = today. `code` is a WMO weather code 
 1–3 clouds; 45, 48 fog; 51–57 drizzle; 61–67 rain; 71–77 snow; 80–82 showers; 85, 86 snow showers; 95–99
 thunderstorm). Source: WeatherKit on iOS (conditions mapped to these codes), Open-Meteo on Android. The phone caches
 for 30 min and fetches with a 6 s timeout; nothing cached and no network: `UNAVAILABLE`.
+
+The hourly record: one record for all hours, only when `hours` > 0 and the source has hours. `hour` is the local
+hour (0–23) of the first entry, the hour that contains now; the entries are consecutive hours, `n` =
+min(`hours`, what the source has), read from the record's length. An entry's `temp` is in °C; its `precip` has the
+probability in bits 0–6 and bit 7 set when that hour is night. There are no sunrise or sunset times: they would
+give the position away, and the watch gets none from `weather`.
+
+A companion from before `hours` (2026-11-20): Android answers `BAD_REQUEST` to two bytes of args, iOS reads `days`
+and answers without the hourly record. An app asks again with `days` alone, or shows no hours.
 
 ### `0x40 http.get`
 
@@ -337,7 +349,7 @@ job:u8 ‖ minutes:u16 ‖ kind:u8 ‖ target:u8 ‖ spec
 |---|---|
 | `job` | 0–3: up to four jobs per package; a job with the same number replaces the old one |
 | `minutes` | how often; under 15 counts as 15, over 1440 as 1440 |
-| `kind` | 0 a web request: `spec` is `http.request`'s joined payload (`method ‖ url_len ‖ url ‖ body`); 1 the weather: `spec` is `weather`'s args (`days`); 2 the calendar: `spec` is `calendar.events`' args |
+| `kind` | 0 a web request: `spec` is `http.request`'s joined payload (`method ‖ url_len ‖ url ‖ body`); 1 the weather: `spec` is `weather`'s args (`days`, or `days ‖ hours`); 2 the calendar: `spec` is `calendar.events`' args |
 | `target` | 0 the widget card (web requests only), 1 the start blob |
 
 What goes to the watch (`push-vectors.json`, made by `tools/push-vectors.py` with the SDK's own `widget_record`):

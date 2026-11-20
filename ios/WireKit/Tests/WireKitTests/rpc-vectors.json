@@ -178,6 +178,59 @@
     "precip": 40
    },
    "hex": "0101f9ff0328"
+  },
+  {
+   "in": {
+    "kind": "hours",
+    "hour": 13,
+    "hours": [
+     {
+      "temp": -3,
+      "code": 3,
+      "precip": 20,
+      "night": false
+     },
+     {
+      "temp": -4.4,
+      "code": 71,
+      "precip": 100,
+      "night": true
+     }
+    ]
+   },
+   "hex": "020dfd0314fc47e4"
+  }
+ ],
+ "weather_args": [
+  {
+   "args": "03",
+   "days": 3,
+   "hours": 0
+  },
+  {
+   "args": "030c",
+   "days": 3,
+   "hours": 12
+  },
+  {
+   "args": "0718",
+   "days": 7,
+   "hours": 24
+  },
+  {
+   "args": "0319",
+   "bad": true,
+   "note": "over 24 hours"
+  },
+  {
+   "args": "030c00",
+   "bad": true,
+   "note": "a third byte"
+  },
+  {
+   "args": "",
+   "bad": true,
+   "note": "no days"
   }
  ],
  "http": [
@@ -790,6 +843,18 @@
    }
   },
   {
+   "payload": "011e000101030c",
+   "job": {
+    "id": 1,
+    "minutes": 30,
+    "kind": 1,
+    "target": 1,
+    "spec": "030c",
+    "cap": "weather"
+   },
+   "note": "the weather with 12 hours"
+  },
+  {
    "payload": "001e00010003",
    "bad": true,
    "note": "only a web request goes into the widget"
@@ -828,6 +893,11 @@
    "payload": "000100",
    "bad": true,
    "note": "cut short"
+  },
+  {
+   "payload": "011e0001010319",
+   "bad": true,
+   "note": "weather with 25 hours"
   }
  ]
 }
