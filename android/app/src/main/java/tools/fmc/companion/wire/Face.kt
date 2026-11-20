@@ -11,8 +11,8 @@ const val MAX_IMAGE_SIDE = 580
 const val SAFE_IMAGE_SIDE = 470
 private const val FACE_HEADER = 36
 private const val TAG_ROOT = 0x20
-private const val TAG_AOD = 0x22
-private const val TAG_PREVIEW = 0x28
+internal const val TAG_AOD = 0x22
+internal const val TAG_PREVIEW = 0x28
 
 /** `screens`: top-level screens, tag → tags of their children; `images`: (w, h) in file order. */
 data class Face(val name: String, val screens: List<Pair<Int, List<Int>>>, val images: List<Pair<Int, Int>>)
@@ -32,6 +32,9 @@ sealed interface FaceRefusal {
     /** The always-on screen has no 0x28 thumbnail: the face that crash-looped a Watch 3 Pro on AOD (#49). */
     data object AodWithoutPreview : FaceRefusal
     data class ImageTooBig(val w: Int, val h: Int) : FaceRefusal
+
+    /** A Watch 3 Pro screen that needs more of the watch's memory than [SCREEN_BUDGET] even after [fitForWatch]. */
+    data class ScreenOverBudget(val aod: Boolean, val bytes: Int) : FaceRefusal
 }
 
 private class Node(val tag: Int, val children: List<Int>?)
@@ -92,9 +95,10 @@ fun faceName(d: ByteArray): String? {
 
 /**
  * Every install goes through this gate. A file that does not parse is not refused here (the watch's installer
- * still gets to), exactly like the site.
+ * still gets to), exactly like the site. [watch3Pro]: the watch it goes to is one ([isWatch3Pro]); run [fitForWatch]
+ * first, it shrinks what it can.
  */
-fun checkFace(d: ByteArray): FaceVerdict {
+fun checkFace(d: ByteArray, watch3Pro: Boolean = false): FaceVerdict {
     if (d.size > 32 shl 20) return FaceVerdict.Refuse(FaceRefusal.TooLarge)
     if (faceName(d) == null) return FaceVerdict.Refuse(FaceRefusal.NotAWatchface)
     val face = parseFace(d) ?: return FaceVerdict.Ok
@@ -102,6 +106,7 @@ fun checkFace(d: ByteArray): FaceVerdict {
     if (aod != null && TAG_PREVIEW !in aod.second) return FaceVerdict.Refuse(FaceRefusal.AodWithoutPreview)
     face.images.firstOrNull { (w, h) -> w > MAX_IMAGE_SIDE || h > MAX_IMAGE_SIDE }
         ?.let { (w, h) -> return FaceVerdict.Refuse(FaceRefusal.ImageTooBig(w, h)) }
+    if (watch3Pro) screenOverBudget(d)?.let { return FaceVerdict.Refuse(FaceRefusal.ScreenOverBudget(it.tag == TAG_AOD, it.bytes)) }
     face.images.firstOrNull { (w, h) -> w > SAFE_IMAGE_SIDE || h > SAFE_IMAGE_SIDE }
         ?.let { (w, h) -> return FaceVerdict.Confirm(w, h) }
     return FaceVerdict.Ok

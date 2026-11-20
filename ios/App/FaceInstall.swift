@@ -16,11 +16,17 @@ enum FaceInstallError: LocalizedError {
             String(localized: "The always-on screen of this face has no thumbnail. Faces like this made the screen flash on a watch. Open it in the editor on fmc.tools and install it from there.")
         case .refused(.imageTooBig(let w, let h)):
             String(localized: "An image of this face is \(w)×\(h) px. Over \(maxImageSide) px can make the watch restart in a loop.")
+        case .refused(.screenOverBudget(let aod, let bytes)):
+            aod ? String(localized: "The always-on screen of this face needs \(mb(bytes)) MB of the watch's memory, more than the \(mb(screenBudget)) MB a Watch 3 Pro holds: the watch would restart in a loop. Use fewer or smaller full-screen images in the editor on fmc.tools.")
+                : String(localized: "The main screen of this face needs \(mb(bytes)) MB of the watch's memory, more than the \(mb(screenBudget)) MB a Watch 3 Pro holds: the watch would restart in a loop. Use fewer or smaller full-screen images in the editor on fmc.tools.")
         case .refused: String(localized: "This file is not a watch face.")
         case .full: String(localized: "The watch is full. Delete a face on the watch (long press the face, swipe one up) and try again.")
         case .noFile: String(localized: "This watch face has no file.")
         }
     }
+
+    /// The site's `toFixed(1)` of megabytes, in the user's locale.
+    private func mb(_ bytes: Int) -> String { (Double(bytes) / 1e6).formatted(.number.precision(.fractionLength(1))) }
 }
 
 /// A dial on the watch. `index`: its place in the watch's own carousel, the only handle on a dial nobody named.
@@ -62,9 +68,21 @@ enum FaceInstall {
         return (bin, verdict)
     }
 
+    /// `fitForWatch` for the watch on the line, then the gate again with its model (ble.model.ts flashFx): a Watch 3
+    /// Pro gets its heaviest images as ETC2, or a refusal for a screen that still doesn't fit. Seconds on a heavy
+    /// face: off the main thread. Returns the file to send and how many images went ETC2.
+    static func fit(_ bin: Data, watchName: String?) async throws -> (Data, Int) {
+        let w3 = isWatch3Pro(watchName)
+        return try await Task.detached(priority: .userInitiated) {
+            let (out, compressed) = try fitForWatch(bin, watch3Pro: w3)
+            if case .refuse(let why) = checkFace(out, watch3Pro: w3) { throw FaceInstallError.refused(why) }
+            return (out, compressed)
+        }.value
+    }
+
     /// Connects and opens a stock session (a new bind only when the saved key is refused, and `bind` allows one:
     /// it pops up on the watch), then `body`. `before` sees the link before anything is sent: it can still refuse.
-    @MainActor static func session<T>(bind: Bool = true, before: @MainActor (BLELink) throws -> Void = { _ in },
+    @MainActor static func session<T>(bind: Bool = true, before: @MainActor (BLELink) async throws -> Void = { _ in },
                                       _ body: (StockSession, String) async throws -> T) async throws -> T {
         // the stock session binds the watch: the RPC listener waits it out
         RPCListener.shared.stop()
@@ -77,7 +95,7 @@ enum FaceInstall {
         }
         try await link.connect(scan: true)
         watchdog.cancel()
-        try before(link)
+        try await before(link)
         let watch = link.watchID?.uuidString ?? ""
         var secret = Keychain.get("k-\(watch)")
         if secret == nil {
@@ -182,12 +200,15 @@ enum FaceInstall {
         return ids.enumerated().map { DialSlot(id: $1, index: $0) }
     }
 
-    /// Uploads `bin`. `slot`: the dial to replace, picked before connecting (`knownFull`); `pick`: the watch is full
-    /// and nothing was picked yet, which dial goes; nil cancels the install.
-    @MainActor static func install(_ bin: Data, seed: String, name: String, slot preset: UInt32? = nil,
+    /// Uploads `bin`, fitted to the watch first (`fit`). `slot`: the dial to replace, picked before connecting
+    /// (`knownFull`); `pick`: the watch is full and nothing was picked yet, which dial goes; nil cancels the install.
+    /// Returns how many images were compressed to fit the watch's memory.
+    @discardableResult
+    @MainActor static func install(_ file: Data, seed: String, name: String, slot preset: UInt32? = nil,
                                    pick: @MainActor ([DialSlot]) async -> UInt32?,
-                                   progress: @escaping @Sendable (Int) -> Void) async throws {
-        try await session { session, watch in
+                                   progress: @escaping @Sendable (Int) -> Void) async throws -> Int {
+        var bin = file, compressed = 0
+        try await session(before: { link in (bin, compressed) = try await fit(file, watchName: link.watchName) }) { session, watch in
             let (mine, installed, counted, header) = await dials(session, watch)
             let cap = capacity
             let full = (counted?.count ?? installed.count) >= capacity
@@ -223,6 +244,7 @@ enum FaceInstall {
             remember(onWatch, count: counted.map { slot != nil || installed.contains(id) ? $0.count : $0.count + 1 },
                      capacity: cap, header: header)
         }
+        return compressed
     }
 }
 

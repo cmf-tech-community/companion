@@ -270,4 +270,10 @@
         <item quantity="one">The %1$d app slot on the watch is taken.</item>
         <item quantity="other">All %1$d app slots on the watch are taken.</item>
     </plurals>
+    <string name="refusal_over_budget_aod">The always-on screen of this face needs %1$s MB of the watch\'s memory, more than the %2$s MB a Watch 3 Pro holds: the watch would restart in a loop. Use fewer or smaller full-screen images in the editor on fmc.tools.</string>
+    <string name="refusal_over_budget_main">The main screen of this face needs %1$s MB of the watch\'s memory, more than the %2$s MB a Watch 3 Pro holds: the watch would restart in a loop. Use fewer or smaller full-screen images in the editor on fmc.tools.</string>
+    <plurals name="fit_note">
+        <item quantity="one">%1$d image was compressed to fit the watch\'s memory. On the watch it can look slightly softer.</item>
+        <item quantity="other">%1$d images were compressed to fit the watch\'s memory. On the watch they can look slightly softer.</item>
+    </plurals>
 </resources>
