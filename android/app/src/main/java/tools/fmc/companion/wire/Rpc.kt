@@ -144,6 +144,26 @@ fun weatherDay(day: Int, min: Double, max: Double, code: Int, precip: Int): Byte
     u8(1); u8(day); u8(min.roundToInt()); u8(max.roundToInt()); u8(code); u8(precip.coerceIn(0, 100))
 }
 
+class WeatherHour(val temp: Double, val code: Int, val precip: Int, val night: Boolean)
+
+/** `days [‖ hours]`: hours 0–24, absent is 0. null for anything else. */
+fun weatherArgs(a: ByteArray): Pair<Int, Int>? = when {
+    a.size == 1 -> a.u8(0) to 0
+    a.size == 2 && a.u8(1) <= 24 -> a.u8(0) to a.u8(1)
+    else -> null
+}
+
+/** `2 ‖ hour ‖ n × (temp:i8 ‖ code ‖ precip)`, at most [limit] hours and never over 24; precip's bit 7 is night.
+ *  [hour] is the local hour (0–23) of the first entry. null when that leaves no hour. */
+fun weatherHours(hour: Int, hours: List<WeatherHour>, limit: Int): ByteArray? {
+    val h = hours.take(limit.coerceIn(0, 24))
+    if (h.isEmpty()) return null
+    return buf {
+        u8(2); u8(hour)
+        for (x in h) { u8(x.temp.roundToInt().coerceIn(-128, 127)); u8(x.code); u8(x.precip.coerceIn(0, 100) or if (x.night) 0x80 else 0) }
+    }
+}
+
 const val HTTP_BODY_MAX = 2048
 
 /** `code ‖ length`, then the body in record-sized chunks; `TOO_LARGE` over 2048 bytes. */
@@ -271,7 +291,7 @@ class RequestParts {
 fun capOf(method: Int, args: ByteArray): String? = when (method) {
     Method.CALENDAR -> "calendar".takeIf { args.size == 3 }
     Method.LOCATION -> "location"
-    Method.WEATHER -> "weather".takeIf { args.size == 1 }
+    Method.WEATHER -> "weather".takeIf { weatherArgs(args) != null }
     Method.HTTP -> httpHost(args)?.let { "http:$it" }
     Method.HTTP_REQUEST -> parseHttpCall(args)?.let { "http:${it.host}" }
     Method.NOTIFICATIONS -> "notifications".takeIf { args.size == 1 }
@@ -399,7 +419,7 @@ data class RefreshJob(
 }
 
 /** `job:u8 ‖ minutes:u16 ‖ kind:u8 ‖ target:u8 ‖ spec`: job 0-3, minutes clamped to 15..1440; spec http.request's
- *  joined payload (kind 0), weather's `days` (1), calendar.events' args (2); target 0 the widget (web requests only),
+ *  joined payload (kind 0), weather's args (1), calendar.events' args (2); target 0 the widget (web requests only),
  *  1 the start blob. null for anything else. */
 fun parseJob(d: ByteArray): RefreshJob? {
     if (d.size < 5 || d.u8(0) > 3 || d.u8(3) > JobKind.CALENDAR || d.u8(4) > PushKind.BLOB) return null
@@ -407,7 +427,7 @@ fun parseJob(d: ByteArray): RefreshJob? {
     val spec = d.copyOfRange(5, d.size)
     val ok = when (d.u8(3)) {
         JobKind.HTTP -> parseHttpCall(spec) != null
-        JobKind.WEATHER -> spec.size == 1
+        JobKind.WEATHER -> weatherArgs(spec) != null
         else -> spec.size == 3
     }
     if (!ok) return null
