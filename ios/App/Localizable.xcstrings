@@ -290,6 +290,124 @@
         }
       }
     },
+    "%lld images were compressed to fit the watch's memory. On the watch they can look slightly softer." : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld image was compressed to fit the watch's memory. On the watch it can look slightly softer."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld images were compressed to fit the watch's memory. On the watch they can look slightly softer."
+                }
+              }
+            }
+          }
+        },
+        "ru" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld изображение сжато, чтобы циферблат поместился в память часов. На часах оно может выглядеть чуть мягче."
+                }
+              },
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld изображения сжаты, чтобы циферблат поместился в память часов. На часах они могут выглядеть чуть мягче."
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld изображений сжато, чтобы циферблат поместился в память часов. На часах они могут выглядеть чуть мягче."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld изображения сжаты, чтобы циферблат поместился в память часов. На часах они могут выглядеть чуть мягче."
+                }
+              }
+            }
+          }
+        },
+        "uk" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld зображення стиснуто, щоб циферблат помістився в пам'ять годинника. На годиннику воно може виглядати трохи м'якше."
+                }
+              },
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld зображення стиснуто, щоб циферблат помістився в пам'ять годинника. На годиннику вони можуть виглядати трохи м'якше."
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld зображень стиснуто, щоб циферблат помістився в пам'ять годинника. На годиннику вони можуть виглядати трохи м'якше."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld зображення стиснуто, щоб циферблат помістився в пам'ять годинника. На годиннику вони можуть виглядати трохи м'якше."
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld imagen se comprimió para que la esfera quepa en la memoria del reloj. En el reloj puede verse algo más suave."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld imágenes se comprimieron para que la esfera quepa en la memoria del reloj. En el reloj pueden verse algo más suaves."
+                }
+              }
+            }
+          }
+        },
+        "hi" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "घड़ी की मेमोरी में फ़ेस फ़िट करने के लिए %lld इमेज कंप्रेस की गई। घड़ी पर वह थोड़ी धुंधली दिख सकती है।"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "घड़ी की मेमोरी में फ़ेस फ़िट करने के लिए %lld इमेज कंप्रेस की गईं। घड़ी पर वे थोड़ी धुंधली दिख सकती हैं।"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "%lld min" : {
       "localizations" : {
         "ru" : {
@@ -4937,6 +5055,34 @@
         }
       }
     },
+    "The always-on screen of this face needs %@ MB of the watch's memory, more than the %@ MB a Watch 3 Pro holds: the watch would restart in a loop. Use fewer or smaller full-screen images in the editor on fmc.tools." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Экрану Always-on этого циферблата нужно %@ МБ памяти часов, а Watch 3 Pro вмещает %@ МБ: часы будут перезагружаться по кругу. Используйте меньше полноэкранных изображений или уменьшите их в редакторе на fmc.tools."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Екрану Always-on цього циферблата потрібно %@ МБ пам'яті годинника, а Watch 3 Pro вміщує %@ МБ: годинник перезавантажуватиметься по колу. Використайте менше повноекранних зображень або зменште їх у редакторі на fmc.tools."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La pantalla siempre activa de esta esfera necesita %@ MB de memoria del reloj, más de los %@ MB que caben en un Watch 3 Pro: el reloj se reiniciaría en bucle. Usa menos imágenes a pantalla completa o hazlas más pequeñas en el editor de fmc.tools."
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "इस फ़ेस की ऑलवेज़-ऑन स्क्रीन को घड़ी की %@ MB मेमोरी चाहिए, जबकि Watch 3 Pro में %@ MB ही आती है: घड़ी बार-बार रीस्टार्ट होगी। fmc.tools के एडिटर में कम या छोटी फ़ुल-स्क्रीन इमेज इस्तेमाल करें।"
+          }
+        }
+      }
+    },
     "The firmware is about 57 MB. Before installing: charge the watch, keep the phone next to it, and close Nothing X." : {
       "localizations" : {
         "ru" : {
@@ -4961,6 +5107,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "फ़र्मवेयर लगभग 57 MB का है। इंस्टॉल करने से पहले: घड़ी चार्ज करें, फ़ोन उसके पास रखें और Nothing X बंद करें।"
+          }
+        }
+      }
+    },
+    "The main screen of this face needs %@ MB of the watch's memory, more than the %@ MB a Watch 3 Pro holds: the watch would restart in a loop. Use fewer or smaller full-screen images in the editor on fmc.tools." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Основному экрану этого циферблата нужно %@ МБ памяти часов, а Watch 3 Pro вмещает %@ МБ: часы будут перезагружаться по кругу. Используйте меньше полноэкранных изображений или уменьшите их в редакторе на fmc.tools."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Основному екрану цього циферблата потрібно %@ МБ пам'яті годинника, а Watch 3 Pro вміщує %@ МБ: годинник перезавантажуватиметься по колу. Використайте менше повноекранних зображень або зменште їх у редакторі на fmc.tools."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La pantalla principal de esta esfera necesita %@ MB de memoria del reloj, más de los %@ MB que caben en un Watch 3 Pro: el reloj se reiniciaría en bucle. Usa menos imágenes a pantalla completa o hazlas más pequeñas en el editor de fmc.tools."
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "इस फ़ेस की मुख्य स्क्रीन को घड़ी की %@ MB मेमोरी चाहिए, जबकि Watch 3 Pro में %@ MB ही आती है: घड़ी बार-बार रीस्टार्ट होगी। fmc.tools के एडिटर में कम या छोटी फ़ुल-स्क्रीन इमेज इस्तेमाल करें।"
           }
         }
       }

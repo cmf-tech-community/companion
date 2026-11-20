@@ -239,6 +239,8 @@ struct FaceDetail: View {
     /// Install progress: 0…1, nil when idle.
     @State private var progress: Double?
     @State private var installed = false
+    /// Images the install compressed to fit the watch's memory (fitForWatch).
+    @State private var compressed = 0
     // DEBUG screenshots: `-install` opens the Nothing X warning
     @State private var closeNothingX = CommandLine.arguments.contains("-install")
     /// A file past the safe image size, waiting for the user's yes.
@@ -373,6 +375,12 @@ struct FaceDetail: View {
             }
             .buttonStyle(.primary)
             .disabled(installed || face.binURL == nil)
+            if installed, compressed > 0 {
+                Text("\(compressed) images were compressed to fit the watch's memory. On the watch they can look slightly softer.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 20)
+            }
         }
     }
 
@@ -419,7 +427,7 @@ struct FaceDetail: View {
         progress = 0
         defer { progress = nil }
         do {
-            try await FaceInstall.install(bin, seed: face.id, name: face.name, slot: preset, pick: { await pick($0) }) { p in
+            compressed = try await FaceInstall.install(bin, seed: face.id, name: face.name, slot: preset, pick: { await pick($0) }) { p in
                 Task { @MainActor in progress = Double(p) / 100 }
             }
             UserDefaults.standard.set(face.thumbURL, forKey: "dial-preview-\(dialId(face.id))")

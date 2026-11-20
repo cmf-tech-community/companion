@@ -13,6 +13,8 @@ object Vectors {
     val face: JSONObject by lazy { load("watchface-vectors.json") }
     /** Made by tools/ota-vectors.ts from the site's inspectOtaImage and Watch.flashFirmware. */
     val ota: JSONObject by lazy { load("ota-vectors.json") }
+    /** Made by tools/face-fit-vectors.ts from the site's budget.ts, fit.ts, etc2.ts and bin.ts. */
+    val fit: JSONObject by lazy { load("face-fit-vectors.json") }
 
     val pkg get() = k.getJSONObject("package")
     /** INFO's reply for a slot holding the vector package, without the status byte. */

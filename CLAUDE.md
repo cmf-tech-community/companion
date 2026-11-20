@@ -33,7 +33,8 @@ Channel/K key, Install, Loader, Face, Stock, Ota, RPC). Both test suites read th
 `ios/WireKit/Tests/WireKitTests/` (Android via `wire/Vectors.kt`). A protocol change means: update the vector,
 then make both ports pass. Some vectors are generated, not hand-written:
 - `vectors.json`: from the Python host of cmf-watch-sdk.
-- `watchface-vectors.json`, `ota-vectors.json`: from the fmc.tools frontend's own code via `tools/*.ts` (bun,
+- `watchface-vectors.json`, `ota-vectors.json`, `face-fit-vectors.json` (Watch 3 Pro memory budget, `fitForWatch`,
+  ETC2): from the fmc.tools frontend's own code via `tools/*.ts` (bun,
   `FMC_FRONTEND` defaults to `~/Developer/pet/fcm-group/fmc_frontend`); the header of each script has the command.
 - `rpc-vectors.json`: the miniapp RPC; new methods go into `docs/miniapp-rpc.md` first.
 

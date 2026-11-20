@@ -34,6 +34,8 @@ public enum FaceRefusal: Equatable, Sendable {
     /// The always-on screen has no 0x28 thumbnail: the face that crash-looped a Watch 3 Pro on AOD (#49).
     case aodWithoutPreview
     case imageTooBig(w: Int, h: Int)
+    /// A Watch 3 Pro screen that needs more of the watch's memory than `screenBudget` even after `fitForWatch`.
+    case screenOverBudget(aod: Bool, bytes: Int)
 }
 
 /// `parseTLV`: nil when a node runs past the end; children only for values of 3+ bytes that parse.
@@ -91,8 +93,9 @@ public func faceName(_ d: Data) -> String? {
 }
 
 /// Every install goes through this gate. A file that does not parse is not refused here (the watch's installer
-/// still gets to), exactly like the site.
-public func checkFace(_ d: Data) -> FaceVerdict {
+/// still gets to), exactly like the site. `watch3Pro`: the watch it goes to is one (`isWatch3Pro`); run
+/// `fitForWatch` first, it shrinks what it can.
+public func checkFace(_ d: Data, watch3Pro: Bool = false) -> FaceVerdict {
     guard d.count <= 32 << 20 else { return .refuse(.tooLarge) }
     guard faceName(d) != nil else { return .refuse(.notAWatchface) }
     guard let face = parseFace(d) else { return .ok }
@@ -101,6 +104,9 @@ public func checkFace(_ d: Data) -> FaceVerdict {
     }
     if let big = face.images.first(where: { $0.w > maxImageSide || $0.h > maxImageSide }) {
         return .refuse(.imageTooBig(w: big.w, h: big.h))
+    }
+    if watch3Pro, let heavy = screenOverBudget(d) {
+        return .refuse(.screenOverBudget(aod: heavy.tag == tagAod, bytes: heavy.bytes))
     }
     if let big = face.images.first(where: { $0.w > safeImageSide || $0.h > safeImageSide }) {
         return .confirm(w: big.w, h: big.h)

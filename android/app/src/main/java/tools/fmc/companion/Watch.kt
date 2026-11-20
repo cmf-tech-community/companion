@@ -3,24 +3,30 @@ package tools.fmc.companion
 import android.content.Context
 import android.util.Log
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import tools.fmc.companion.wire.DialCount
 import tools.fmc.companion.wire.FaceRefusal
 import tools.fmc.companion.wire.FaceVerdict
+import tools.fmc.companion.wire.Fitted
 import tools.fmc.companion.wire.KSession
 import tools.fmc.companion.wire.LoaderState
 import tools.fmc.companion.wire.MAX_IMAGE_SIDE
 import tools.fmc.companion.wire.PackageHeader
+import tools.fmc.companion.wire.SCREEN_BUDGET
 import tools.fmc.companion.wire.StockSession
 import tools.fmc.companion.wire.Stub
 import tools.fmc.companion.wire.UploadError
 import tools.fmc.companion.wire.WireError
 import tools.fmc.companion.wire.checkFace
 import tools.fmc.companion.wire.dialId
+import tools.fmc.companion.wire.fitForWatch
 import tools.fmc.companion.wire.hex
 import tools.fmc.companion.wire.hexOrNull
 import tools.fmc.companion.wire.installFace
+import tools.fmc.companion.wire.isWatch3Pro
 import tools.fmc.companion.wire.readLoader
 
 // What the app does with the watch, as ios/App WatchModel.swift and FaceInstall.swift.
@@ -60,7 +66,25 @@ fun refusalText(why: FaceRefusal) = when (why) {
         str(R.string.refusal_aod)
     is FaceRefusal.ImageTooBig ->
         str(R.string.refusal_image_too_big, why.w, why.h, MAX_IMAGE_SIDE)
+    is FaceRefusal.ScreenOverBudget ->
+        str(if (why.aod) R.string.refusal_over_budget_aod else R.string.refusal_over_budget_main, mb(why.bytes), mb(SCREEN_BUDGET))
     else -> str(R.string.refusal_not_face)
+}
+
+/** The site's `toFixed(1)` of megabytes, in the user's locale. */
+private fun mb(bytes: Int) = "%.1f".format(bytes / 1e6)
+
+/**
+ * [fitForWatch] for the watch on the line, then the gate again with its model (ble.model.ts flashFx): a Watch 3 Pro
+ * gets its heaviest images as ETC2, or a refusal for a screen that still doesn't fit. Seconds on a heavy face: off
+ * the main thread.
+ */
+suspend fun fitFace(bin: ByteArray, watchName: String?): Fitted = withContext(Dispatchers.Default) {
+    val w3 = isWatch3Pro(watchName)
+    val fitted = fitForWatch(bin, w3)
+    val verdict = checkFace(fitted.bin, w3)
+    if (verdict is FaceVerdict.Refuse) throw FaceInstallError(refusalText(verdict.why))
+    fitted
 }
 
 /** The file and the gate's verdict: nothing goes to the watch before the user has seen it. */
@@ -133,7 +157,7 @@ const val CAPACITY = 6
  * pops up on the watch), then [body]. [before] sees the link before anything is sent: it can still refuse.
  */
 internal suspend fun <T> withStockSession(
-    context: Context, store: SecureStore, bind: Boolean = true, before: (BleLink) -> Unit = {},
+    context: Context, store: SecureStore, bind: Boolean = true, before: suspend (BleLink) -> Unit = {},
     body: suspend (StockSession, String) -> T,
 ): T {
     val link = BleLink(context)
@@ -239,41 +263,47 @@ fun knownFull(context: Context, seed: String): List<DialSlot>? {
 }
 
 /**
- * [preset]: the dial to replace, picked before connecting ([knownFull]); [pick]: the watch is full and nothing was
- * picked yet, which dial goes; null cancels the install.
+ * Uploads [file], fitted to the watch first ([fitFace]). [preset]: the dial to replace, picked before connecting
+ * ([knownFull]); [pick]: the watch is full and nothing was picked yet, which dial goes; null cancels the install.
+ * Returns how many images were compressed to fit the watch's memory.
  */
 suspend fun installFaceOnWatch(
-    context: Context, store: SecureStore, bin: ByteArray, seed: String, name: String,
+    context: Context, store: SecureStore, file: ByteArray, seed: String, name: String,
     pick: suspend (List<DialSlot>) -> Long?, preset: Long? = null, progress: (Int) -> Unit,
-) = withStockSession(context, store) { session, watch ->
-    val prefs = context.getSharedPreferences("dials", Context.MODE_PRIVATE)
-    val d = dials(context, session, watch)
-    val installed = d.installed
-    val cap = CAPACITY
-    val full = (d.counted?.count ?: installed.size) >= CAPACITY
-    // which dial to replace (ble.ts NoFreeSlotError, slot-dialog.svelte)
-    suspend fun ask() = pick(installed.mapIndexed { i, id -> slot(context, prefs, id, i) })
-        ?: throw CancellationException("no dial picked")
-    // full and not a re-install of this face: ask before sending anything
-    // a pick made from a stale list stands only while that dial is still there
-    var slot: Long? = preset?.takeIf { it in installed } ?: if (full && dialId(seed) !in installed) ask() else null
-    val id = try {
-        try {
-            installFace(session, bin, seed, installed, cap, slot, progress = progress)
-        } catch (e: UploadError.NoFreeSlot) {
-            if (slot != null || installed.isEmpty()) throw e
-            // the count said there was room and the watch said no: the header reading is wrong, or it is missing
-            slot = ask()
-            installFace(session, bin, seed, installed, cap, slot, progress = progress)
+): Int {
+    var fitted = Fitted(file, 0)
+    withStockSession(context, store, before = { fitted = fitFace(file, it.watchName) }) { session, watch ->
+        val bin = fitted.bin
+        val prefs = context.getSharedPreferences("dials", Context.MODE_PRIVATE)
+        val d = dials(context, session, watch)
+        val installed = d.installed
+        val cap = CAPACITY
+        val full = (d.counted?.count ?: installed.size) >= CAPACITY
+        // which dial to replace (ble.ts NoFreeSlotError, slot-dialog.svelte)
+        suspend fun ask() = pick(installed.mapIndexed { i, id -> slot(context, prefs, id, i) })
+            ?: throw CancellationException("no dial picked")
+        // full and not a re-install of this face: ask before sending anything
+        // a pick made from a stale list stands only while that dial is still there
+        var slot: Long? = preset?.takeIf { it in installed } ?: if (full && dialId(seed) !in installed) ask() else null
+        val id = try {
+            try {
+                installFace(session, bin, seed, installed, cap, slot, progress = progress)
+            } catch (e: UploadError.NoFreeSlot) {
+                if (slot != null || installed.isEmpty()) throw e
+                // the count said there was room and the watch said no: the header reading is wrong, or it is missing
+                slot = ask()
+                installFace(session, bin, seed, installed, cap, slot, progress = progress)
+            }
+        } catch (_: UploadError.NoFreeSlot) {
+            throw FaceInstallError(str(R.string.watch_full_error))
         }
-    } catch (_: UploadError.NoFreeSlot) {
-        throw FaceInstallError(str(R.string.watch_full_error))
+        val now = d.mine.filter { it != slot } + if (id in d.mine) emptyList() else listOf(id)
+        prefs.edit().putString("dials-$watch", now.joinToString(",")).putString("name-$id", name).apply()
+        val onWatch = slot?.let { sl -> installed.map { if (it == sl) id else it } }
+            ?: if (id in installed) installed else installed + id
+        remember(context, onWatch, d.counted?.let { if (slot != null || id in installed) it.count else it.count + 1 }, cap, d.header)
     }
-    val now = d.mine.filter { it != slot } + if (id in d.mine) emptyList() else listOf(id)
-    prefs.edit().putString("dials-$watch", now.joinToString(",")).putString("name-$id", name).apply()
-    val onWatch = slot?.let { sl -> installed.map { if (it == sl) id else it } }
-        ?: if (id in installed) installed else installed + id
-    remember(context, onWatch, d.counted?.let { if (slot != null || id in installed) it.count else it.count + 1 }, cap, d.header)
+    return fitted.compressed
 }
 
 /** The services' link has the watch again after a drop; AppModel reads it again (debounced). */
