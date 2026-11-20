@@ -22,11 +22,15 @@ struct RPCVectors: Decodable {
     }
     struct Weather: Decodable {
         struct In: Decodable {
-            let kind: String; let temp: Double?; let code: Int; let wind: Double?; let humidity: Int?; let age_min: Int?
+            let kind: String; let temp: Double?; let code: Int?; let wind: Double?; let humidity: Int?; let age_min: Int?
             let day: Int?; let min: Double?; let max: Double?; let precip: Int?
+            struct Hour: Decodable { let temp: Double; let code: Int; let precip: Int; let night: Bool }
+            let hour: Int?; let hours: [Hour]?
         }
         let `in`: In; let hex: String
     }
+    struct WeatherArgs: Decodable { let args: String; let days: Int?; let hours: Int?; let bad: Bool? }
+    let weather_args: [WeatherArgs]
     struct Http: Decodable {
         struct In: Decodable { let code: Int; let body: String }
         let `in`: In; let records: [String]
@@ -152,12 +156,40 @@ private let rv = RPCVectors.shared
     }
     for w in rv.weather {
         let i = w.in
-        let got = i.kind == "now"
-            ? weatherRecord(WeatherNow(temp: i.temp!, code: i.code, wind: i.wind!, humidity: i.humidity!,
-                                       ageMin: i.age_min!))
-            : weatherRecord(WeatherDay(day: i.day!, min: i.min!, max: i.max!, code: i.code, precip: i.precip!))
+        let got: Data? = switch i.kind {
+        case "now": weatherRecord(WeatherNow(temp: i.temp!, code: i.code!, wind: i.wind!, humidity: i.humidity!,
+                                             ageMin: i.age_min!))
+        case "hours": weatherRecord(WeatherHours(hour: i.hour!, hours: i.hours!.map {
+            WeatherHour(temp: $0.temp, code: $0.code, precip: $0.precip, night: $0.night) }), limit: 24)
+        default: weatherRecord(WeatherDay(day: i.day!, min: i.min!, max: i.max!, code: i.code!, precip: i.precip!))
+        }
         #expect(got == hex(w.hex), "\(i.kind)")
     }
+    for a in rv.weather_args {
+        let got = weatherArgs(hex(a.args))
+        if a.bad == true { #expect(got == nil, "\(a.args)") } else {
+            #expect(got?.days == a.days && got?.hours == a.hours, "\(a.args)")
+        }
+    }
+    let two = WeatherHours(hour: 23, hours: (0..<30).map { WeatherHour(temp: Double($0), code: 0, precip: 0, night: false) })
+    #expect(weatherRecord(two, limit: 2) == Data([2, 23, 0, 0, 0, 1, 0, 0]), "cut to the hours asked")
+    #expect(weatherRecord(two, limit: 30)?.count == 2 + 24 * 3, "never over 24")
+    #expect(weatherRecord(two, limit: 0) == nil && weatherRecord(WeatherHours(hour: 0, hours: []), limit: 5) == nil)
+    #expect(weatherRecord(WeatherHours(hour: 0, hours: [WeatherHour(temp: -200, code: 0, precip: 130, night: true)]), limit: 1)
+        == Data([2, 0, 0x80, 0, 0x80 | 100]), "temp and precip clamped")
+}
+
+@Test @MainActor func rpcWeatherHours() async throws {
+    let h = FakeHost()
+    h.given["weather.app"] = ["weather": true]
+    let r = await ask(h, call(RPCMethod.weather, [3, 12]))
+    #expect(r?.0 == .ok)
+    #expect(r?.1.map { $0[0] } == [0, 2, 1, 1, 1], "current, hourly, then the days")
+    #expect(r?.1[1].count == 2 + 12 * 3)
+    #expect(await ask(h, call(RPCMethod.weather, [3]))?.1.map { $0[0] } == [0, 1, 1, 1], "no hours unless asked")
+    #expect(await ask(h, call(RPCMethod.weather, [3, 25]))?.0 == .badRequest)
+    h.noHours = true
+    #expect(await ask(h, call(RPCMethod.weather, [1, 12]))?.1.map { $0[0] } == [0, 1], "the source has no hours")
     for n in rv.notifications {
         let i = n.in
         #expect(notificationRecord(PhoneNotification(ageMin: i.age_min, app: i.app, text: i.text), show: i.show)
@@ -242,8 +274,10 @@ private let rv = RPCVectors.shared
         return events
     }
     func location() async throws -> LocationFix { throw RPCStatus.unavailable }
-    func weather() async throws -> (now: WeatherNow, days: [WeatherDay]) {
+    var noHours = false
+    func weather() async throws -> (now: WeatherNow, hours: WeatherHours?, days: [WeatherDay]) {
         (WeatherNow(temp: 1, code: 0, wind: 1, humidity: 50, ageMin: 0),
+         noHours ? nil : WeatherHours(hour: 22, hours: (0..<48).map { WeatherHour(temp: Double($0), code: 3, precip: 10, night: $0 < 9) }),
          (0..<10).map { WeatherDay(day: $0, min: 0, max: 1, code: 0, precip: 0) })
     }
     func http(_ call: HTTPCall, package: String) async throws -> (code: Int, body: Data) {

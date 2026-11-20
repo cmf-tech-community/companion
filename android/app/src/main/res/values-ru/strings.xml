@@ -63,7 +63,7 @@
     <string name="faces_change_failed">Не удалось изменить циферблаты на часах: %1$s</string>
     <string name="delete_face_title">Удалить %1$s?</string>
     <string name="delete_face_text">Он пропадёт с часов. Чтобы вернуть его, установите заново.</string>
-    <string name="watch_faces_count">Циферблаты · %1$d</string>
+    <string name="watch_faces_count">Циферблаты · %1$s</string>
     <string name="show_on_watch">Показать на часах</string>
     <string name="reading_watch">Читаем часы…</string>
     <string name="connect_to_see_faces">Подключитесь, чтобы увидеть циферблаты на часах.</string>
@@ -265,6 +265,14 @@
         <item quantity="few">Заняты все %1$d слота для приложений на часах.</item>
         <item quantity="many">Заняты все %1$d слотов для приложений на часах.</item>
         <item quantity="other">Заняты все %1$d слота для приложений на часах.</item>
+    </plurals>
+    <string name="refusal_over_budget_aod">Экрану Always-on этого циферблата нужно %1$s МБ памяти часов, а Watch 3 Pro вмещает %2$s МБ: часы будут перезагружаться по кругу. Используйте меньше полноэкранных изображений или уменьшите их в редакторе на fmc.tools.</string>
+    <string name="refusal_over_budget_main">Основному экрану этого циферблата нужно %1$s МБ памяти часов, а Watch 3 Pro вмещает %2$s МБ: часы будут перезагружаться по кругу. Используйте меньше полноэкранных изображений или уменьшите их в редакторе на fmc.tools.</string>
+    <plurals name="fit_note">
+        <item quantity="one">%1$d изображение сжато, чтобы циферблат поместился в память часов. На часах оно может выглядеть чуть мягче.</item>
+        <item quantity="few">%1$d изображения сжаты, чтобы циферблат поместился в память часов. На часах они могут выглядеть чуть мягче.</item>
+        <item quantity="many">%1$d изображений сжато, чтобы циферблат поместился в память часов. На часах они могут выглядеть чуть мягче.</item>
+        <item quantity="other">%1$d изображения сжаты, чтобы циферблат поместился в память часов. На часах они могут выглядеть чуть мягче.</item>
     </plurals>
     <!-- Rescue a stuck watch -->
     <string name="rescue_title">Спасти зависшие часы</string>

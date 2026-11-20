@@ -16,7 +16,7 @@ import WireKit
     private var fix: CheckedContinuation<Void, Never>?
     /// rounded coordinate → locality
     private var places: [String: String] = [:]
-    private var cached: (at: Date, now: CurrentWeather, days: [DayWeather])?
+    private var cached: (at: Date, now: CurrentWeather, hours: [HourWeather], days: [DayWeather])?
 
     override init() {
         super.init()
@@ -126,13 +126,13 @@ import WireKit
                            ageMin: Int(-loc.timestamp.timeIntervalSinceNow / 60), place: await locality(loc))
     }
 
-    func weather() async throws -> (now: WeatherNow, days: [WeatherDay]) {
+    func weather() async throws -> (now: WeatherNow, hours: WeatherHours?, days: [WeatherDay]) {
         if cached.map({ -$0.at.timeIntervalSinceNow > 30 * 60 }) ?? true {
             let loc = try await lastLocation()
-            let (now, daily) = try await withDeadline(.seconds(6)) {
-                try await WeatherService.shared.weather(for: loc, including: .current, .daily)
+            let (now, hourly, daily) = try await withDeadline(.seconds(6)) {
+                try await WeatherService.shared.weather(for: loc, including: .current, .hourly, .daily)
             }
-            cached = (.now, now, Array(daily))
+            cached = (.now, now, Array(hourly), Array(daily))
         }
         guard let cached else { throw RPCStatus.unavailable }
         let cal = Calendar.current, today = cal.startOfDay(for: .now)
@@ -148,7 +148,13 @@ import WireKit
                               max: d.highTemperature.converted(to: .celsius).value, code: wmo(d.condition),
                               precip: Int((d.precipitationChance * 100).rounded()))
         }
-        return (now, days)
+        // the hours from the one that contains now: a cached copy may start an hour back
+        let thisHour = cal.dateInterval(of: .hour, for: .now)?.start ?? .now
+        let hours = cached.hours.filter { $0.date >= thisHour }.map {
+            WeatherHour(temp: $0.temperature.converted(to: .celsius).value, code: wmo($0.condition),
+                        precip: Int(($0.precipitationChance * 100).rounded()), night: !$0.isDaylight)
+        }
+        return (now, hours.isEmpty ? nil : WeatherHours(hour: cal.component(.hour, from: thisHour), hours: hours), days)
     }
 
     /// With the user's headers for (package, host) and its cookie jar; neither goes to the watch or the log.

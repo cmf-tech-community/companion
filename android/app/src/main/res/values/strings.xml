@@ -69,7 +69,7 @@
     <string name="faces_change_failed">Couldn\'t change the faces on the watch: %1$s</string>
     <string name="delete_face_title">Delete %1$s?</string>
     <string name="delete_face_text">It goes from the watch. To get it back, install it again.</string>
-    <string name="watch_faces_count">Watch faces · %1$d</string>
+    <string name="watch_faces_count">Watch faces · %1$s</string>
     <string name="show_on_watch">Show on the watch</string>
     <string name="reading_watch">Reading the watch…</string>
     <string name="connect_to_see_faces">Connect to see the faces on the watch.</string>
@@ -269,6 +269,12 @@
     <plurals name="no_free_slot">
         <item quantity="one">The %1$d app slot on the watch is taken.</item>
         <item quantity="other">All %1$d app slots on the watch are taken.</item>
+    </plurals>
+    <string name="refusal_over_budget_aod">The always-on screen of this face needs %1$s MB of the watch\'s memory, more than the %2$s MB a Watch 3 Pro holds: the watch would restart in a loop. Use fewer or smaller full-screen images in the editor on fmc.tools.</string>
+    <string name="refusal_over_budget_main">The main screen of this face needs %1$s MB of the watch\'s memory, more than the %2$s MB a Watch 3 Pro holds: the watch would restart in a loop. Use fewer or smaller full-screen images in the editor on fmc.tools.</string>
+    <plurals name="fit_note">
+        <item quantity="one">%1$d image was compressed to fit the watch\'s memory. On the watch it can look slightly softer.</item>
+        <item quantity="other">%1$d images were compressed to fit the watch\'s memory. On the watch they can look slightly softer.</item>
     </plurals>
     <!-- Rescue a stuck watch -->
     <string name="rescue_title">Rescue a stuck watch</string>

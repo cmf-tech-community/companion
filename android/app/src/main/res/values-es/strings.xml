@@ -63,7 +63,7 @@
     <string name="faces_change_failed">No se pudieron cambiar las esferas del reloj: %1$s</string>
     <string name="delete_face_title">¿Eliminar %1$s?</string>
     <string name="delete_face_text">Se borra del reloj. Para recuperarla, vuelve a instalarla.</string>
-    <string name="watch_faces_count">Esferas · %1$d</string>
+    <string name="watch_faces_count">Esferas · %1$s</string>
     <string name="show_on_watch">Mostrar en el reloj</string>
     <string name="reading_watch">Leyendo el reloj…</string>
     <string name="connect_to_see_faces">Conéctate para ver las esferas del reloj.</string>
@@ -261,6 +261,12 @@
         <item quantity="one">La única ranura de apps del reloj (%1$d) está ocupada.</item>
         <item quantity="many">Las %1$d ranuras de apps del reloj están ocupadas.</item>
         <item quantity="other">Las %1$d ranuras de apps del reloj están ocupadas.</item>
+    </plurals>
+    <string name="refusal_over_budget_aod">La pantalla siempre activa de esta esfera necesita %1$s MB de memoria del reloj, más de los %2$s MB que caben en un Watch 3 Pro: el reloj se reiniciaría en bucle. Usa menos imágenes a pantalla completa o hazlas más pequeñas en el editor de fmc.tools.</string>
+    <string name="refusal_over_budget_main">La pantalla principal de esta esfera necesita %1$s MB de memoria del reloj, más de los %2$s MB que caben en un Watch 3 Pro: el reloj se reiniciaría en bucle. Usa menos imágenes a pantalla completa o hazlas más pequeñas en el editor de fmc.tools.</string>
+    <plurals name="fit_note">
+        <item quantity="one">%1$d imagen se comprimió para que la esfera quepa en la memoria del reloj. En el reloj puede verse algo más suave.</item>
+        <item quantity="other">%1$d imágenes se comprimieron para que la esfera quepa en la memoria del reloj. En el reloj pueden verse algo más suaves.</item>
     </plurals>
     <!-- Rescue a stuck watch -->
     <string name="rescue_title">Rescatar un reloj bloqueado</string>

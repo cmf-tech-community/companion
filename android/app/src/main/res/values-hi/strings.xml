@@ -63,7 +63,7 @@
     <string name="faces_change_failed">घड़ी पर फ़ेस बदले नहीं जा सके: %1$s</string>
     <string name="delete_face_title">%1$s हटाएँ?</string>
     <string name="delete_face_text">यह घड़ी से हट जाएगा। वापस पाने के लिए इसे फिर से इंस्टॉल करें।</string>
-    <string name="watch_faces_count">वॉच फ़ेस · %1$d</string>
+    <string name="watch_faces_count">वॉच फ़ेस · %1$s</string>
     <string name="show_on_watch">घड़ी पर दिखाएँ</string>
     <string name="reading_watch">घड़ी पढ़ी जा रही है…</string>
     <string name="connect_to_see_faces">घड़ी के फ़ेस देखने के लिए कनेक्ट करें।</string>
@@ -257,6 +257,12 @@
     <plurals name="no_free_slot">
         <item quantity="one">घड़ी पर ऐप का %1$d स्लॉट भरा है।</item>
         <item quantity="other">घड़ी पर ऐप के सभी %1$d स्लॉट भरे हैं।</item>
+    </plurals>
+    <string name="refusal_over_budget_aod">इस फ़ेस की ऑलवेज़-ऑन स्क्रीन को घड़ी की %1$s MB मेमोरी चाहिए, जबकि Watch 3 Pro में %2$s MB ही आती है: घड़ी बार-बार रीस्टार्ट होगी। fmc.tools के एडिटर में कम या छोटी फ़ुल-स्क्रीन इमेज इस्तेमाल करें।</string>
+    <string name="refusal_over_budget_main">इस फ़ेस की मुख्य स्क्रीन को घड़ी की %1$s MB मेमोरी चाहिए, जबकि Watch 3 Pro में %2$s MB ही आती है: घड़ी बार-बार रीस्टार्ट होगी। fmc.tools के एडिटर में कम या छोटी फ़ुल-स्क्रीन इमेज इस्तेमाल करें।</string>
+    <plurals name="fit_note">
+        <item quantity="one">घड़ी की मेमोरी में फ़ेस फ़िट करने के लिए %1$d इमेज कंप्रेस की गई। घड़ी पर वह थोड़ी धुंधली दिख सकती है।</item>
+        <item quantity="other">घड़ी की मेमोरी में फ़ेस फ़िट करने के लिए %1$d इमेज कंप्रेस की गईं। घड़ी पर वे थोड़ी धुंधली दिख सकती हैं।</item>
     </plurals>
     <!-- Rescue a stuck watch -->
     <string name="rescue_title">अटकी हुई घड़ी ठीक करें</string>

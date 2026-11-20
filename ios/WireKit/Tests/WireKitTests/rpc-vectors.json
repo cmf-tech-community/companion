@@ -178,6 +178,111 @@
     "precip": 40
    },
    "hex": "0101f9ff0328"
+  },
+  {
+   "in": {
+    "kind": "hours",
+    "hour": 13,
+    "hours": [
+     {
+      "temp": -3,
+      "code": 3,
+      "precip": 20,
+      "night": false
+     },
+     {
+      "temp": -4.4,
+      "code": 71,
+      "precip": 100,
+      "night": true
+     }
+    ]
+   },
+   "hex": "020dfd0314fc47e4"
+  },
+  {
+   "in": {
+    "kind": "now",
+    "temp": -0.25,
+    "code": 0,
+    "wind": 1,
+    "humidity": 50,
+    "age_min": 0
+   },
+   "hex": "00fdff00013200",
+   "note": "a half rounds away from zero: -2.5 tenths are -3"
+  },
+  {
+   "in": {
+    "kind": "day",
+    "day": 0,
+    "min": -2.5,
+    "max": -0.5,
+    "code": 0,
+    "precip": 0
+   },
+   "hex": "0100fdff0000",
+   "note": "halves away from zero"
+  },
+  {
+   "in": {
+    "kind": "hours",
+    "hour": 0,
+    "hours": [
+     {
+      "temp": -0.5,
+      "code": 0,
+      "precip": 0,
+      "night": true
+     },
+     {
+      "temp": -2.5,
+      "code": 0,
+      "precip": 0,
+      "night": true
+     },
+     {
+      "temp": 2.5,
+      "code": 0,
+      "precip": 0,
+      "night": true
+     }
+    ]
+   },
+   "hex": "0200ff0080fd0080030080",
+   "note": "halves away from zero"
+  }
+ ],
+ "weather_args": [
+  {
+   "args": "03",
+   "days": 3,
+   "hours": 0
+  },
+  {
+   "args": "030c",
+   "days": 3,
+   "hours": 12
+  },
+  {
+   "args": "0718",
+   "days": 7,
+   "hours": 24
+  },
+  {
+   "args": "0319",
+   "bad": true,
+   "note": "over 24 hours"
+  },
+  {
+   "args": "030c00",
+   "bad": true,
+   "note": "a third byte"
+  },
+  {
+   "args": "",
+   "bad": true,
+   "note": "no days"
   }
  ],
  "http": [
@@ -790,6 +895,18 @@
    }
   },
   {
+   "payload": "011e000101030c",
+   "job": {
+    "id": 1,
+    "minutes": 30,
+    "kind": 1,
+    "target": 1,
+    "spec": "030c",
+    "cap": "weather"
+   },
+   "note": "the weather with 12 hours"
+  },
+  {
    "payload": "001e00010003",
    "bad": true,
    "note": "only a web request goes into the widget"
@@ -828,6 +945,11 @@
    "payload": "000100",
    "bad": true,
    "note": "cut short"
+  },
+  {
+   "payload": "011e0001010319",
+   "bad": true,
+   "note": "weather with 25 hours"
   }
  ]
 }

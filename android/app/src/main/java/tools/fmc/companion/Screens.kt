@@ -455,6 +455,8 @@ fun FaceScreen(model: AppModel, id: String, author: (String) -> Unit = {}, back:
     /** Install progress 0…1, null when idle. */
     var progress by remember(id) { mutableStateOf<Float?>(null) }
     var installed by remember(id) { mutableStateOf(false) }
+    /** Images the install compressed to fit the watch's memory (fitForWatch). */
+    var compressed by remember(id) { mutableStateOf(0) }
     var closeNothingX by remember { mutableStateOf(false) }
     /** A file past the safe image size, waiting for the user's yes. */
     var big by remember { mutableStateOf<Triple<ByteArray, Int, Int>?>(null) }
@@ -473,7 +475,7 @@ fun FaceScreen(model: AppModel, id: String, author: (String) -> Unit = {}, back:
         val f = face ?: return@launch
         progress = 0f
         try {
-            installFaceOnWatch(context, model.store, bin, f.id, f.name, pick = { slots -> ask(slots) }, preset = preset) { p -> scope.launch { progress = p / 100f } }
+            compressed = installFaceOnWatch(context, model.store, bin, f.id, f.name, pick = { slots -> ask(slots) }, preset = preset) { p -> scope.launch { progress = p / 100f } }
             context.getSharedPreferences("dials", 0).edit().putString("preview-${dialId(f.id)}", f.thumbURL).apply()
             installed = true
             Analytics.track("face_installed", mapOf("id" to f.id))
@@ -544,6 +546,10 @@ fun FaceScreen(model: AppModel, id: String, author: (String) -> Unit = {}, back:
                             } else {
                                 PrimaryButton(if (installed) stringResource(R.string.installed) else stringResource(R.string.install), !installed && f.binURL != null) {
                                     install()
+                                }
+                                if (installed && compressed > 0) {
+                                    Text(pluralStringResource(R.plurals.fit_note, compressed, compressed),
+                                        style = MaterialTheme.typography.bodySmall, color = Fmc.secondary, textAlign = TextAlign.Center)
                                 }
                             }
                             Text(stringResource(R.string.close_nothing_x_hint),
