@@ -49,7 +49,10 @@ import tools.fmc.companion.wire.locationRecord
 import tools.fmc.companion.wire.notificationRecord
 import tools.fmc.companion.wire.rgb565
 import tools.fmc.companion.wire.u8
+import tools.fmc.companion.wire.WeatherHour
+import tools.fmc.companion.wire.weatherArgs
 import tools.fmc.companion.wire.weatherDay
+import tools.fmc.companion.wire.weatherHours
 import tools.fmc.companion.wire.weatherNow
 
 // The miniapp services on Android (docs/miniapp-rpc.md, "Methods"). The dispatcher (wire/Rpc.kt answer) has
@@ -74,7 +77,7 @@ class PhoneServices(private val context: Context, private val grants: Grants) : 
             Method.LOCATION -> location().let { (l, place) ->
                 listOf(locationRecord(l.latitude, l.longitude, ageMin(l), place))
             }
-            Method.WEATHER -> weather(args.u8(0).coerceAtMost(7))
+            Method.WEATHER -> weatherArgs(args)!!.let { (days, hours) -> weather(days.coerceAtMost(7), hours) }
             Method.HTTP -> http(pkg, HttpCall("GET", String(args), httpHost(args)!!))
             Method.HTTP_REQUEST -> http(pkg, parseHttpCall(args)!!)
             Method.NOTIFICATIONS -> NotificationWatcher.records(context, args.u8(0).coerceIn(1, 10), show)
@@ -220,7 +223,7 @@ class PhoneServices(private val context: Context, private val grants: Grants) : 
     private class Forecast(val at: Long, val json: JSONObject)
 
     /** Open-Meteo, cached 30 min; a stale copy when the network is down. */
-    private suspend fun weather(days: Int): List<ByteArray> {
+    private suspend fun weather(days: Int, hours: Int): List<ByteArray> {
         val now = System.currentTimeMillis()
         val f = forecast?.takeIf { now - it.at < 30 * 60_000 }
             ?: runCatching { Forecast(now, fetchForecast()) }.getOrNull()?.also { forecast = it }
@@ -228,6 +231,16 @@ class PhoneServices(private val context: Context, private val grants: Grants) : 
         val cur = f.json.getJSONObject("current")
         val out = mutableListOf(weatherNow(cur.getDouble("temperature_2m"), cur.getInt("weather_code"),
             cur.getDouble("wind_speed_10m"), cur.getInt("relative_humidity_2m"), (now - f.at) / 60_000))
+        // the hours from the one that contains now: a cached copy may start an hour back
+        f.json.optJSONObject("hourly")?.let { h ->
+            val times = h.getJSONArray("time")
+            val thisHour = java.time.LocalDateTime.now().truncatedTo(ChronoUnit.HOURS)
+            val list = (0 until times.length()).filter { !java.time.LocalDateTime.parse(times.getString(it)).isBefore(thisHour) }.map {
+                WeatherHour(h.getJSONArray("temperature_2m").getDouble(it), h.getJSONArray("weather_code").getInt(it),
+                    h.getJSONArray("precipitation_probability").optInt(it, 0), h.getJSONArray("is_day").optInt(it, 1) == 0)
+            }
+            weatherHours(thisHour.hour, list, hours)?.let { out += it }
+        }
         val d = f.json.getJSONObject("daily")
         val today = LocalDate.now()
         val dates = d.getJSONArray("time")
@@ -246,6 +259,7 @@ class PhoneServices(private val context: Context, private val grants: Grants) : 
         val url = "https://api.open-meteo.com/v1/forecast?latitude=%.2f&longitude=%.2f".format(Locale.US, l.latitude, l.longitude) +
             "&current=temperature_2m,weather_code,wind_speed_10m,relative_humidity_2m" +
             "&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max" +
+            "&hourly=temperature_2m,weather_code,precipitation_probability,is_day&forecast_hours=26" +
             "&wind_speed_unit=ms&timezone=auto&forecast_days=8"
         val (code, body) = fetch(url)
         if (code != 200) throw RpcError(RpcStatus.UNAVAILABLE)

@@ -57,12 +57,40 @@ class RpcTest {
 
     @Test fun weather() = each("weather") { t ->
         val i = t.getJSONObject("in")
-        val r = if (i.getString("kind") == "now") {
-            weatherNow(i.getDouble("temp"), i.getInt("code"), i.getDouble("wind"), i.getInt("humidity"), i.getLong("age_min"))
-        } else {
-            weatherDay(i.getInt("day"), i.getDouble("min"), i.getDouble("max"), i.getInt("code"), i.getInt("precip"))
+        val r = when (i.getString("kind")) {
+            "now" -> weatherNow(i.getDouble("temp"), i.getInt("code"), i.getDouble("wind"), i.getInt("humidity"), i.getLong("age_min"))
+            "hours" -> {
+                val h = i.getJSONArray("hours")
+                weatherHours(i.getInt("hour"), (0 until h.length()).map { h.getJSONObject(it) }.map {
+                    WeatherHour(it.getDouble("temp"), it.getInt("code"), it.getInt("precip"), it.getBoolean("night"))
+                }, 24)!!
+            }
+            else -> weatherDay(i.getInt("day"), i.getDouble("min"), i.getDouble("max"), i.getInt("code"), i.getInt("precip"))
         }
         assertEquals(t.getString("hex"), r.hex())
+    }
+
+    @Test fun weatherArgsVectors() = each("weather_args") { t ->
+        val got = weatherArgs(hex(t.getString("args")))
+        if (t.optBoolean("bad")) assertEquals(null, got, t.getString("args"))
+        else assertEquals(t.getInt("days") to t.getInt("hours"), got, t.getString("args"))
+    }
+
+    @Test fun weatherHoursLimits() {
+        val many = (0 until 30).map { WeatherHour(it.toDouble(), 0, 0, false) }
+        assertEquals("0217000000010000", weatherHours(23, many, 2)!!.hex(), "cut to the hours asked")
+        assertEquals(2 + 24 * 3, weatherHours(23, many, 30)!!.size, "never over 24")
+        assertEquals(null, weatherHours(23, many, 0))
+        assertEquals(null, weatherHours(0, emptyList(), 5))
+        assertEquals("02008000e4", weatherHours(0, listOf(WeatherHour(-200.0, 0, 130, true)), 1)!!.hex(), "temp and precip clamped")
+    }
+
+    @Test fun weatherAsksItsCapWithHours() = runBlocking {
+        val p = FakePhone()
+        val q = "R1Q".toByteArray() + byteArrayOf(1, 0x30, 3, 12)
+        assertEquals(RpcStatus.ASK, status(answer("a", q, p)))
+        assertEquals(listOf("a weather"), p.asked)
+        assertEquals(RpcStatus.BAD_REQUEST, status(answer("a", "R1Q".toByteArray() + byteArrayOf(1, 0x30, 3, 25), p)))
     }
 
     @Test fun http() {
