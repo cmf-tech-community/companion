@@ -63,7 +63,7 @@
     <string name="faces_change_failed">Не удалось изменить циферблаты на часах: %1$s</string>
     <string name="delete_face_title">Удалить %1$s?</string>
     <string name="delete_face_text">Он пропадёт с часов. Чтобы вернуть его, установите заново.</string>
-    <string name="watch_faces_count">Циферблаты · %1$d</string>
+    <string name="watch_faces_count">Циферблаты · %1$s</string>
     <string name="show_on_watch">Показать на часах</string>
     <string name="reading_watch">Читаем часы…</string>
     <string name="connect_to_see_faces">Подключитесь, чтобы увидеть циферблаты на часах.</string>

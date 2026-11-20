@@ -63,7 +63,7 @@
     <string name="faces_change_failed">Не вдалося змінити циферблати на годиннику: %1$s</string>
     <string name="delete_face_title">Видалити %1$s?</string>
     <string name="delete_face_text">Він зникне з годинника. Щоб повернути його, встановіть знову.</string>
-    <string name="watch_faces_count">Циферблати · %1$d</string>
+    <string name="watch_faces_count">Циферблати · %1$s</string>
     <string name="show_on_watch">Показати на годиннику</string>
     <string name="reading_watch">Читаємо годинник…</string>
     <string name="connect_to_see_faces">Підключіться, щоб побачити циферблати на годиннику.</string>
