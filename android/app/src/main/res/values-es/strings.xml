@@ -262,4 +262,28 @@
         <item quantity="many">Las %1$d ranuras de apps del reloj están ocupadas.</item>
         <item quantity="other">Las %1$d ranuras de apps del reloj están ocupadas.</item>
     </plurals>
+    <!-- Rescue a stuck watch -->
+    <string name="rescue_title">Rescatar un reloj bloqueado</string>
+    <string name="rescue_intro">Para un reloj que se reinicia una y otra vez tras instalar una esfera. El teléfono espera al reloj y, en cada reinicio, envía un comando en cuanto puede, hasta que llega.</string>
+    <string name="rescue_no_key_title">Este teléfono no tiene la clave de tu reloj</string>
+    <string name="rescue_no_key">El rescate necesita la clave que la app guarda la primera vez que lee el reloj o instala una esfera. Sin ella, el reloj pediría una confirmación en pantalla, y un reloj bloqueado no puede mostrarla. Prueba con el teléfono que instaló la esfera o con la página de rescate de fmc.tools en el navegador que la instaló.</string>
+    <string name="rescue_reset">Restablecer de fábrica</string>
+    <string name="rescue_remove_faces">Quitar esferas personalizadas</string>
+    <string name="rescue_remove_footer">Deja solo las esferas integradas que el reloj indicó la última vez y muestra la primera. Tus datos se mantienen. Aún no probado en un reloj bloqueado.</string>
+    <string name="rescue_reset_footer">Borra todo lo que hay en el reloj y lo reinicia.</string>
+    <string name="rescue_stop">Detener</string>
+    <string name="rescue_keep_open">Mantén esta pantalla abierta y el teléfono junto al reloj.</string>
+    <string name="rescue_log">Registro</string>
+    <string name="rescue_copy_log">Copiar registro</string>
+    <string name="rescue_remove_title">¿Quitar las esferas personalizadas?</string>
+    <string name="rescue_erase_title">¿Borrar el reloj?</string>
+    <string name="rescue_remove">Quitar</string>
+    <string name="rescue_erase">Borrar</string>
+    <string name="rescue_remove_text">El reloj conserva solo sus esferas integradas.</string>
+    <string name="rescue_erase_text">Se borrarán todos los datos del reloj. No se puede deshacer.</string>
+    <string name="rescue_waiting">Esperando al reloj…</string>
+    <string name="rescue_connected">Conectado, enviando…</string>
+    <string name="rescue_sent">Enviado. El reloj debería reiniciarse limpio. Si sigue reiniciándose en bucle, vuelve a empezar.</string>
+    <string name="rescue_done">Listo. El reloj conservó solo sus esferas integradas.</string>
+    <string name="rescue_refused">El reloj rechazó la clave que tiene la app: se volvió a vincular desde entonces. El rescate no puede seguir sin una confirmación en el reloj.</string>
 </resources>

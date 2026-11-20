@@ -78,6 +78,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Build
@@ -157,20 +158,22 @@ class Nav {
         set(v) { if (v == null) apps.removeLastOrNull() else apps.add(v) }
     var developer by mutableStateOf(false)
     var firmware by mutableStateOf(false)
+    var rescue by mutableStateOf(false)
 
     /** Back to the tab's root. */
-    fun root() { pages.clear(); signingIn = false; apps.clear(); developer = false; firmware = false }
+    fun root() { pages.clear(); signingIn = false; apps.clear(); developer = false; firmware = false; rescue = false }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun App(model: AppModel, nav: Nav) {
-    BackHandler(nav.face != null || nav.signingIn || nav.app != null || nav.developer || nav.firmware) {
+    BackHandler(nav.face != null || nav.signingIn || nav.app != null || nav.developer || nav.firmware || nav.rescue) {
         when {
             nav.signingIn -> nav.signingIn = false
             nav.app != null -> nav.app = null
             nav.developer -> nav.developer = false
             nav.firmware -> nav.firmware = false
+            nav.rescue -> nav.rescue = false
             else -> nav.face = null
         }
     }
@@ -197,6 +200,7 @@ fun App(model: AppModel, nav: Nav) {
                 nav.app != null -> AppScreen(model, nav.app!!, { nav.app = it }) { nav.app = null }
                 nav.developer -> DeveloperScreen { nav.developer = false }
                 nav.firmware -> FirmwareScreen(model) { nav.firmware = false }
+                nav.rescue -> RescueScreen(model.store) { nav.rescue = false }
                 nav.face?.startsWith("user:") == true -> AuthorScreen(model, nav.face!!.removePrefix("user:"), { nav.face = it }) { nav.face = null }
                 nav.face != null -> FaceScreen(model, nav.face!!, { nav.face = "user:$it" }) { nav.face = null }
                 nav.tab == 0 -> CatalogScreen(model) { nav.face = it }
@@ -219,7 +223,7 @@ fun Bar(title: String, back: (() -> Unit)? = null, actions: @Composable RowScope
 
 /** Asks for Bluetooth once, then runs `action`. */
 @Composable
-private fun withBluetooth(action: () -> Unit): () -> Unit {
+fun withBluetooth(action: () -> Unit): () -> Unit {
     val context = LocalContext.current
     val perms = arrayOf(Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN)
     val ask = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { granted ->
@@ -758,6 +762,9 @@ fun WatchScreen(model: AppModel, nav: Nav, signIn: () -> Unit) {
                         }
                         HorizontalDivider()
                     }
+                    // reachable without a connected watch: it is for one that can't connect
+                    NavRow(stringResource(R.string.rescue_title), onClick = { nav.rescue = true }) { IconTile(Icons.Default.Warning, Color(0xFFE53935)) }
+                    HorizontalDivider()
                     NavRow(stringResource(R.string.developer_options), onClick = { nav.developer = true }) { IconTile(Icons.Default.Build, Color(0xFF757575)) }
                     HorizontalDivider()
                     LanguageRow()

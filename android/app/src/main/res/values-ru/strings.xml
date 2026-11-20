@@ -266,4 +266,28 @@
         <item quantity="many">Заняты все %1$d слотов для приложений на часах.</item>
         <item quantity="other">Заняты все %1$d слота для приложений на часах.</item>
     </plurals>
+    <!-- Rescue a stuck watch -->
+    <string name="rescue_title">Спасти зависшие часы</string>
+    <string name="rescue_intro">Для часов, которые раз за разом перезагружаются после циферблата. Телефон ждёт часы и при каждой перезагрузке отправляет одну команду, как только это возможно, пока она не дойдёт.</string>
+    <string name="rescue_no_key_title">На этом телефоне нет ключа от ваших часов</string>
+    <string name="rescue_no_key">Для спасения нужен ключ, который приложение сохраняет, когда впервые читает часы или ставит циферблат. Без него часы попросили бы подтверждение на экране, а зависшие часы его не покажут. Попробуйте с телефона, с которого ставили циферблат, или на странице спасения fmc.tools в браузере, из которого его ставили.</string>
+    <string name="rescue_reset">Сброс к заводским настройкам</string>
+    <string name="rescue_remove_faces">Убрать свои циферблаты</string>
+    <string name="rescue_remove_footer">Оставляет только встроенные циферблаты из последнего списка часов и включает первый. Данные остаются. На зависших часах ещё не проверено.</string>
+    <string name="rescue_reset_footer">Стирает всё на часах и перезагружает их.</string>
+    <string name="rescue_stop">Остановить</string>
+    <string name="rescue_keep_open">Не закрывайте этот экран и держите телефон рядом с часами.</string>
+    <string name="rescue_log">Журнал</string>
+    <string name="rescue_copy_log">Скопировать журнал</string>
+    <string name="rescue_remove_title">Убрать свои циферблаты?</string>
+    <string name="rescue_erase_title">Стереть часы?</string>
+    <string name="rescue_remove">Убрать</string>
+    <string name="rescue_erase">Стереть</string>
+    <string name="rescue_remove_text">На часах останутся только встроенные циферблаты.</string>
+    <string name="rescue_erase_text">Все данные на часах будут стёрты. Это нельзя отменить.</string>
+    <string name="rescue_waiting">Ждём часы…</string>
+    <string name="rescue_connected">Подключено, отправляем…</string>
+    <string name="rescue_sent">Отправлено. Часы должны перезагрузиться начисто. Если они всё ещё перезагружаются по кругу, запустите снова.</string>
+    <string name="rescue_done">Готово. На часах остались только встроенные циферблаты.</string>
+    <string name="rescue_refused">Часы отклонили ключ, который есть у приложения: с тех пор их привязали заново. Без подтверждения на часах спасение невозможно.</string>
 </resources>

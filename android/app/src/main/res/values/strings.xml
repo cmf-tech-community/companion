@@ -270,4 +270,28 @@
         <item quantity="one">The %1$d app slot on the watch is taken.</item>
         <item quantity="other">All %1$d app slots on the watch are taken.</item>
     </plurals>
+    <!-- Rescue a stuck watch -->
+    <string name="rescue_title">Rescue a stuck watch</string>
+    <string name="rescue_intro">For a watch that restarts over and over after a watch face. The phone waits for the watch and sends one command the moment it can, on every restart, until it lands.</string>
+    <string name="rescue_no_key_title">This phone has no key for your watch</string>
+    <string name="rescue_no_key">Rescue needs the key this app saves the first time it reads the watch or installs a face. Without it the watch would ask for a confirmation on its screen, which a stuck watch can\'t show. Try the phone that installed the face, or the fmc.tools rescue page in the browser that installed it.</string>
+    <string name="rescue_reset">Factory reset</string>
+    <string name="rescue_remove_faces">Remove custom faces</string>
+    <string name="rescue_remove_footer">Keeps only the built-in faces the watch last reported and shows the first one. Your data stays. Not yet tried on a stuck watch.</string>
+    <string name="rescue_reset_footer">Erases everything on the watch and restarts it.</string>
+    <string name="rescue_stop">Stop</string>
+    <string name="rescue_keep_open">Keep this screen open and the phone next to the watch.</string>
+    <string name="rescue_log">Log</string>
+    <string name="rescue_copy_log">Copy log</string>
+    <string name="rescue_remove_title">Remove the custom faces?</string>
+    <string name="rescue_erase_title">Erase the watch?</string>
+    <string name="rescue_remove">Remove</string>
+    <string name="rescue_erase">Erase</string>
+    <string name="rescue_remove_text">The watch keeps only its built-in faces.</string>
+    <string name="rescue_erase_text">All data on the watch is erased. This can\'t be undone.</string>
+    <string name="rescue_waiting">Waiting for the watch…</string>
+    <string name="rescue_connected">Connected, sending…</string>
+    <string name="rescue_sent">Sent. The watch should restart clean. If it still restarts in a loop, start again.</string>
+    <string name="rescue_done">Done. The watch kept only its built-in faces.</string>
+    <string name="rescue_refused">The watch refused the key this app has: it was paired again since. Rescue can\'t go on without a confirmation on the watch.</string>
 </resources>
