@@ -67,7 +67,7 @@ struct ContentView: View {
     /// One path for every page the Watch tab pushes: links by value only, mixed link styles push twice.
     @State private var path: [Route] = Self.launchPath
 
-    enum Route: Hashable { case firmware, developer, wakeProbe, signIn }
+    enum Route: Hashable { case firmware, rescue, developer, wakeProbe, signIn }
 
     // DEBUG screenshots: `-signin` opens Sign in
     private static var launchPath: [Route] { CommandLine.arguments.contains("-signin") ? [.signIn] : [] }
@@ -111,6 +111,13 @@ struct ContentView: View {
                         }
                     }
                     .tint(.primary)
+                    // reachable without a connected watch: it is for one that can't connect
+                    NavigationLink(value: Route.rescue) {
+                        HStack(spacing: 12) {
+                            SettingsIcon(symbol: "cross.case.fill", color: .red)
+                            Text("Rescue a stuck watch")
+                        }
+                    }
                     NavigationLink(value: Route.developer) {
                         HStack(spacing: 12) {
                             SettingsIcon(symbol: "hammer.fill", color: .gray)
@@ -153,6 +160,7 @@ struct ContentView: View {
             .navigationDestination(for: Route.self) { route in
                 switch route {
                 case .firmware: FirmwareView()
+                case .rescue: RescueView()
                 case .developer: DeveloperView()
                 case .wakeProbe:
                     #if DEBUG
