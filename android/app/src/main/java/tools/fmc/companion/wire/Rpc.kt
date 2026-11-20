@@ -135,13 +135,16 @@ fun locationRecord(lat: Double, lon: Double, ageMin: Long, place: String): ByteA
     add(utf8Cut(place, 32))
 }
 
+/** Halves away from zero, as Swift's `rounded()`: `roundToInt` takes −0.5 to 0, and the two ports must agree. */
+private fun Double.roundAway(): Int = if (this < 0) -(-this + 0.5).toInt() else (this + 0.5).toInt()
+
 fun weatherNow(temp: Double, code: Int, wind: Double, humidity: Int, ageMin: Long): ByteArray = buf {
-    u8(0); le16((temp * 10).roundToInt()); u8(code); u8(wind.roundToInt().coerceIn(0, 255))
+    u8(0); le16((temp * 10).roundAway()); u8(code); u8(wind.roundAway().coerceIn(0, 255))
     u8(humidity.coerceIn(0, 100)); u8(ageMin.coerceIn(0, 255).toInt())
 }
 
 fun weatherDay(day: Int, min: Double, max: Double, code: Int, precip: Int): ByteArray = buf {
-    u8(1); u8(day); u8(min.roundToInt()); u8(max.roundToInt()); u8(code); u8(precip.coerceIn(0, 100))
+    u8(1); u8(day); u8(min.roundAway()); u8(max.roundAway()); u8(code); u8(precip.coerceIn(0, 100))
 }
 
 class WeatherHour(val temp: Double, val code: Int, val precip: Int, val night: Boolean)
@@ -160,7 +163,7 @@ fun weatherHours(hour: Int, hours: List<WeatherHour>, limit: Int): ByteArray? {
     if (h.isEmpty()) return null
     return buf {
         u8(2); u8(hour)
-        for (x in h) { u8(x.temp.roundToInt().coerceIn(-128, 127)); u8(x.code); u8(x.precip.coerceIn(0, 100) or if (x.night) 0x80 else 0) }
+        for (x in h) { u8(x.temp.roundAway().coerceIn(-128, 127)); u8(x.code); u8(x.precip.coerceIn(0, 100) or if (x.night) 0x80 else 0) }
     }
 }
 
