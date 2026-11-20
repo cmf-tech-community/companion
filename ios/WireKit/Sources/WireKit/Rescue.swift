@@ -1,9 +1,14 @@
 import Foundation
 
 // Rescue for a watch stuck in a boot loop on a bad face (fmc_frontend rescue.model.ts, ble.ts connect({rescue}),
-// authenticate, factoryReset). Pure: the platform's BLE code calls `connected()` once notifications are on and
-// `notify` for every value on fff1, and writes what they return to fff2 at once. Everything that doesn't depend on the
-// watch's nonce is sealed in `init`, before the watch is even in range.
+// authenticate, fetchInfo's time, factoryReset). Pure: the platform's BLE code calls `connected()` once notifications
+// are on, `retry()` every 50 ms until the watch answers, and `notify` for every value on fff1, and writes what they
+// return to fff2 at once. Everything that doesn't depend on the watch's nonce is sealed in `init`, before the watch is
+// even in range.
+//
+// From the cmf-watch-utils emulator (stock 1.0.1.77): the watch drops every write until its own MTU exchange has
+// brought the command service up (~200 ms after the connect), hence the retry; and it ignores 0x009A until a time
+// (0x8004) has set its link flag. A clock more than 2 min off is applied on the second 0x8004 only, so it goes twice.
 //
 // Only a watch this app already holds keys for: the authkey of an earlier install or read (`stock-<id>`), else the
 // pairing secret (`k-<id>`), with which a new bind needs no tap on the watch (the second 0x8049 is answered, cmf-watch-sdk
@@ -38,6 +43,8 @@ public extension StockCmd {
 
 public struct RescuePlan {
     public let action: RescueAction
+    /// The time 0x8004 carries; a fixed one in the tests.
+    public var clock: () -> (now: Date, tzSeconds: Int) = { (Date(), TimeZone.current.secondsFromGMT()) }
     /// The authkey in use. A bind replaces it: the caller saves it after `connected` / `notify`.
     public private(set) var k1: Data?
     let secret: Data?
@@ -81,6 +88,15 @@ public struct RescuePlan {
         return w(pairFrames, "pair")
     }
 
+    /// Again what the watch hasn't answered yet: it drops writes until its command service is up.
+    public func retry() -> [RescueWrite] {
+        switch phase {
+        case .name: w(nameFrames, "authName")
+        case .pair: w(pairFrames, "pair")
+        default: []
+        }
+    }
+
     public mutating func notify(_ uuid: String, _ value: Data) -> RescueStep {
         guard uuid.uppercased() == Uuid.cmdNotify else { return RescueStep() }
         let got: (cmd: UInt32, payload: Data)?
@@ -122,13 +138,13 @@ public struct RescuePlan {
             let s = sessionKey(nonce: p, k1: k1)
             session = s
             phase = .confirm
-            // the action rides right behind the confirm: commands are handled in order, so it lands once auth does
+            // the time and the action ride right behind the confirm: commands are handled in order
             return RescueStep(writes: w(stockFrames(StockCmd.authConfirmReq, Data([marker]), key: s), "confirm")
-                + actionWrites(s), note: "004C")
+                + timeWrites(s) + timeWrites(s) + actionWrites(s), note: "004C")
         case (StockCmd.authConfirmRep, .confirm):
             phase = .sent
             // again on the confirmed session, in case the early one was dropped; a reset that lands twice is one reset
-            return RescueStep(writes: actionWrites(session!), note: "0004: authenticated",
+            return RescueStep(writes: timeWrites(session!) + actionWrites(session!), note: "0004: authenticated",
                               done: action == .factoryReset)
         case (StockCmd.wfInstalled, .sent), (StockCmd.wfInstalled, .confirm):
             return RescueStep(note: "A055 \(p.hexString)", done: true)
@@ -142,6 +158,11 @@ public struct RescuePlan {
         prepare()
         phase = .pair
         return RescueStep(writes: w(pairFrames, "pair"), note: note)
+    }
+
+    func timeWrites(_ s: Data) -> [RescueWrite] {
+        let c = clock()
+        return w(stockFrames(StockCmd.time, stockTime(now: c.now, tzSeconds: c.tzSeconds), key: s), "time")
     }
 
     func actionWrites(_ s: Data) -> [RescueWrite] {
@@ -158,6 +179,14 @@ public struct RescuePlan {
     private func w(_ frames: [Data], _ what: String) -> [RescueWrite] {
         frames.map { RescueWrite(uuid: Uuid.cmdWrite, data: $0, what: what) }
     }
+}
+
+/// ble.ts fetchInfo's 0x8004: unix seconds ‖ the zone's offset in ms, big endian.
+public func stockTime(now: Date, tzSeconds: Int) -> Data {
+    var t = Data()
+    t.be(UInt32(now.timeIntervalSince1970))
+    t.be(UInt32(bitPattern: Int32(tzSeconds * 1000)))
+    return t
 }
 
 /// The dials to keep for `.keepDials`: of the list the watch last reported, the stock ones (and the photo face's

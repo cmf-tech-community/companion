@@ -6,62 +6,38 @@
  "nonce": "c0c1c2c3c4c5c6c7c8c9cacbcccdcecf",
  "session": "2721bef348a631f61642974a738a11ad",
  "bound_k1": "a1fcb238eef452e162d01dadfb1d704a",
- "known": [
-  {
-   "writes": [
-    "f50010ffff000100018049e6cd0d7593af784265cbb412dcd6f651"
-   ]
+ "now": 1795176000,
+ "tz_seconds": 10800,
+ "known": {
+  "writes": {
+   "authName": "f50010ffff000100018049e6cd0d7593af784265cbb412dcd6f651",
+   "nonce": "f50010ffff00010001804b03fbe3d875a633318e45d6ef391b1afe",
+   "confirm": "f50010ffff00010001804dcae9c7d60e66285685287e1be135a31b",
+   "time": "f50010ffff0001000180046fd7e35f27d4deb761f492727a3ca0c5",
+   "factoryReset": "f50010009a000100010001cae9c7d60e66285685287e1be135a31b"
   },
-  {
-   "notify": "f50010ffff00010001004903fbe3d875a633318e45d6ef391b1afe",
-   "writes": [
-    "f50010ffff00010001804b03fbe3d875a633318e45d6ef391b1afe"
-   ]
-  },
-  {
-   "notify": "f50020ffff00010001004c4ce7e003a65ce0d630d460c99b0bc9f61b25d143b7ab890d89d5ef01f9420999",
-   "writes": [
-    "f50010ffff00010001804dcae9c7d60e66285685287e1be135a31b"
-   ]
-  },
-  {
-   "notify": "f50010ffff000100010004d28402ef25e0656c1208202564d97ea8",
-   "writes": [
-    "f50010009a000100010001cae9c7d60e66285685287e1be135a31b"
-   ]
+  "notifies": {
+   "authMac": "f50010ffff00010001004903fbe3d875a633318e45d6ef391b1afe",
+   "nonceReply": "f50020ffff00010001004c4ce7e003a65ce0d630d460c99b0bc9f61b25d143b7ab890d89d5ef01f9420999",
+   "confirmReply": "f50010ffff000100010004d28402ef25e0656c1208202564d97ea8"
   }
- ],
- "bind": [
-  {
-   "writes": [
-    "f50034ffff000100018047a0a1a2a3a4a5a6a7a8a9aaabacadaeaf0a0b3710c5cf987e9d491f3c4e97ef54421e87f34a1c53ddb711281e88cfefdb8261d3e4"
-   ]
+ },
+ "bind": {
+  "writes": {
+   "pair": "f50034ffff000100018047a0a1a2a3a4a5a6a7a8a9aaabacadaeaf0a0b3710c5cf987e9d491f3c4e97ef54421e87f34a1c53ddb711281e88cfefdb8261d3e4",
+   "authName": "f50010ffff000100018049dee2c3a0d86c9a60dd203e4908f8a477",
+   "nonce": "f50010ffff00010001804b361f32723a54fbdd6c23fc5905054d13",
+   "confirm": "f50010ffff00010001804db230f6f9126f68501cf9c31cd1dbf7d7",
+   "time": "f50010ffff0001000180044a62622e741ae89e5fff6e73d16b0cda",
+   "factoryReset": "f50010009a000100010001b230f6f9126f68501cf9c31cd1dbf7d7"
   },
-  {
-   "notify": "f50034ffff000100010048b0b1b2b3b4b5b6b7b8b9babbbcbdbebf9f2cf7554e2d17500d2392cf42a906ca4b60fab911eca80f9d0709a615b3f46764f9ecd5",
-   "writes": [
-    "f50010ffff000100018049dee2c3a0d86c9a60dd203e4908f8a477"
-   ]
-  },
-  {
-   "notify": "f50010ffff000100010049361f32723a54fbdd6c23fc5905054d13",
-   "writes": [
-    "f50010ffff00010001804b361f32723a54fbdd6c23fc5905054d13"
-   ]
-  },
-  {
-   "notify": "f50020ffff00010001004c8a71e9d1b1f58d1205ce1820089fc90102c48328567149daf9094a32eb3935eb",
-   "writes": [
-    "f50010ffff00010001804db230f6f9126f68501cf9c31cd1dbf7d7"
-   ]
-  },
-  {
-   "notify": "f50010ffff00010001000402f7ca6e0d1a31fa93183f97d0d1bc7c",
-   "writes": [
-    "f50010009a000100010001b230f6f9126f68501cf9c31cd1dbf7d7"
-   ]
+  "notifies": {
+   "pairReply": "f50034ffff000100010048b0b1b2b3b4b5b6b7b8b9babbbcbdbebf9f2cf7554e2d17500d2392cf42a906ca4b60fab911eca80f9d0709a615b3f46764f9ecd5",
+   "authMac": "f50010ffff000100010049361f32723a54fbdd6c23fc5905054d13",
+   "nonceReply": "f50020ffff00010001004c8a71e9d1b1f58d1205ce1820089fc90102c48328567149daf9094a32eb3935eb",
+   "confirmReply": "f50010ffff00010001000402f7ca6e0d1a31fa93183f97d0d1bc7c"
   }
- ],
+ },
  "keep_dials": {
   "ids": [
    273,

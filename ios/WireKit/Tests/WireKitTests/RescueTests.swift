@@ -2,12 +2,14 @@ import Foundation
 import Testing
 @testable import WireKit
 
-/// Made by tools/rescue-vectors.ts from fmc_frontend's Watch.authenticate, Watch.pair and Watch.factoryReset.
+/// Made by tools/rescue-vectors.ts from fmc_frontend's Watch.authenticate, Watch.pair, Watch.fetchInfo and
+/// Watch.factoryReset: the frames by command, and what the scripted watch notified.
 struct RescueVectors: Decodable {
-    struct Step: Decodable { let notify: String?; let writes: [String] }
+    struct Talk: Decodable { let writes, notifies: [String: String] }
     struct Keep: Decodable { let ids: [UInt32]; let active: Int; let frames: [String] }
     let k1, secret, random1, bound_k1: String
-    let known, bind: [Step]
+    let now, tz_seconds: Int
+    let known, bind: Talk
     let keep_dials: Keep
 
     static let shared: RescueVectors = {
@@ -18,53 +20,54 @@ struct RescueVectors: Decodable {
 
 private let rv = RescueVectors.shared
 
-/// Replays the site's conversation: each step's writes are a prefix of ours (we may add the action behind the confirm
-/// and a second authName after a bind), and we write nothing the site doesn't.
-private func replay(_ plan: inout RescuePlan, _ steps: [RescueVectors.Step]) -> RescueStep {
-    let all = Set(steps.flatMap(\.writes))
-    var last = RescueStep()
-    for (i, s) in steps.enumerated() {
-        let ours: [RescueWrite]
-        if let n = s.notify {
-            last = plan.notify(Uuid.cmdNotify, hex(n))
-            ours = last.writes
-        } else {
-            ours = plan.connected()
-        }
-        #expect(ours.prefix(s.writes.count).map(\.data.hexString) == s.writes, "step \(i)")
-        #expect(ours.allSatisfy { all.contains($0.data.hexString) && $0.uuid == Uuid.cmdWrite }, "step \(i)")
-    }
-    return last
+private func plan(_ action: RescueAction = .factoryReset, k1: String? = rv.k1, secret: String? = nil) -> RescuePlan {
+    var p = RescuePlan(action: action, k1: k1.map(hex), secret: secret.map(hex), random1: hex(rv.random1))!
+    p.clock = { (Date(timeIntervalSince1970: TimeInterval(rv.now)), rv.tz_seconds) }
+    return p
 }
 
-@Test func rescueWithSavedKeyMatchesSite() {
-    var plan = RescuePlan(action: .factoryReset, k1: hex(rv.k1), secret: nil)!
-    let last = replay(&plan, rv.known)
+private func hexes(_ w: [RescueWrite]) -> [String] { w.map(\.data.hexString) }
+private func feed(_ p: inout RescuePlan, _ t: RescueVectors.Talk, _ n: String) -> RescueStep {
+    p.notify(Uuid.cmdNotify, hex(t.notifies[n]!))
+}
+
+/// The site's frames, in the plan's order: the time twice and the reset right behind the confirm, both again on 0x0004.
+private func expectConversation(_ p: inout RescuePlan, _ t: RescueVectors.Talk) {
+    let f = t.writes
+    #expect(hexes(feed(&p, t, "authMac").writes) == [f["nonce"]!])
+    #expect(p.retry().isEmpty)
+    #expect(hexes(feed(&p, t, "nonceReply").writes) == [f["confirm"]!, f["time"]!, f["time"]!, f["factoryReset"]!])
+    let last = feed(&p, t, "confirmReply")
+    #expect(hexes(last.writes) == [f["time"]!, f["factoryReset"]!])
     #expect(last.done && !last.refused)
 }
 
-@Test func rescueBindsWithSecretWithoutTap() {
-    var plan = RescuePlan(action: .factoryReset, k1: nil, secret: hex(rv.secret), random1: hex(rv.random1))!
-    #expect(replay(&plan, rv.bind).done)
-    #expect(plan.k1 == hex(rv.bound_k1))
+@Test func rescueWithSavedKeyMatchesSite() {
+    var p = plan()
+    #expect(hexes(p.connected()) == [rv.known.writes["authName"]!])
+    // the watch drops writes until its service is up: authName again until it answers
+    #expect(hexes(p.retry()) == [rv.known.writes["authName"]!])
+    expectConversation(&p, rv.known)
 }
 
-@Test func rescueSendsResetBehindConfirm() {
-    var plan = RescuePlan(action: .factoryReset, k1: hex(rv.k1), secret: nil)!
-    _ = plan.connected()
-    _ = plan.notify(Uuid.cmdNotify, hex(rv.known[1].notify!))
-    let w = plan.notify(Uuid.cmdNotify, hex(rv.known[2].notify!)).writes.map(\.what)
-    #expect(w == ["confirm", "factoryReset"])
+@Test func rescueBindsWithSecretWithoutTap() {
+    var p = plan(k1: nil, secret: rv.secret)
+    #expect(hexes(p.connected()) == [rv.bind.writes["pair"]!])
+    #expect(hexes(p.retry()) == [rv.bind.writes["pair"]!])
+    // the first authName after a bind opens the popup, the second is answered: two, no tap
+    #expect(hexes(feed(&p, rv.bind, "pairReply").writes) == Array(repeating: rv.bind.writes["authName"]!, count: 2))
+    #expect(p.k1 == hex(rv.bound_k1))
+    expectConversation(&p, rv.bind)
 }
 
 @Test func rescueStaleKeyFallsBackToSecret() {
-    var plan = RescuePlan(action: .factoryReset, k1: hex(rv.k1), secret: hex(rv.secret), random1: hex(rv.random1))!
-    _ = plan.connected()
     let failed = stockFrames(StockCmd.authFailed, Data([1, 2]), key: nil)[0]
-    let s = plan.notify(Uuid.cmdNotify, failed)
-    #expect(s.writes.map(\.what) == ["pair"] && !s.refused && plan.k1 == nil)
+    var p = plan(secret: rv.secret)
+    _ = p.connected()
+    let s = p.notify(Uuid.cmdNotify, failed)
+    #expect(s.writes.map(\.what) == ["pair"] && !s.refused && p.k1 == nil)
     // without a secret a refused key ends the rescue: nothing to bind with
-    var only = RescuePlan(action: .factoryReset, k1: hex(rv.k1), secret: nil)!
+    var only = plan()
     _ = only.connected()
     #expect(only.notify(Uuid.cmdNotify, failed).refused)
 }
@@ -74,11 +77,11 @@ private func replay(_ plan: inout RescuePlan, _ steps: [RescueVectors.Step]) -> 
 }
 
 @Test func rescueKeepDialsMatchesSiteCodec() {
-    var plan = RescuePlan(action: .keepDials(rv.keep_dials.ids, active: rv.keep_dials.active), k1: hex(rv.k1), secret: nil)!
-    _ = plan.connected()
-    _ = plan.notify(Uuid.cmdNotify, hex(rv.known[1].notify!))
-    let w = plan.notify(Uuid.cmdNotify, hex(rv.known[2].notify!)).writes.filter { $0.what == "keepDials" }
-    #expect(w.map(\.data.hexString) == rv.keep_dials.frames)
+    var p = plan(.keepDials(rv.keep_dials.ids, active: rv.keep_dials.active))
+    _ = p.connected()
+    _ = feed(&p, rv.known, "authMac")
+    let w = feed(&p, rv.known, "nonceReply").writes.filter { $0.what == "keepDials" }
+    #expect(hexes(w) == rv.keep_dials.frames)
 }
 
 @Test func rescueKeepsStockDials() {

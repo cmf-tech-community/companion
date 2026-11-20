@@ -142,6 +142,7 @@ class Rescuer(private val context: Context, private val plans: Map<String, Rescu
 
     private class Conn(val id: String, val gatt: BluetoothGatt, val at: Long) {
         var write: BluetoothGattCharacteristic? = null
+        var notifying = false
         var mtu = 23
         val queue = ArrayDeque<RescueWrite>()
         var busy = false
@@ -157,6 +158,8 @@ class Rescuer(private val context: Context, private val plans: Map<String, Rescu
     private val active = mutableMapOf<String, Conn>()
     private val seen = mutableSetOf<String>()
     private var stopped = false
+    /** Repeats what the watch hasn't answered every 50 ms: it drops writes until its command service is up. */
+    private val retry = java.util.concurrent.Executors.newSingleThreadScheduledExecutor()
 
     private fun idOf(d: BluetoothDevice) = sha256Hex(d.address).take(16)
 
@@ -175,11 +178,17 @@ class Rescuer(private val context: Context, private val plans: Map<String, Rescu
         }
         val settings = ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build()
         adapter.bluetoothLeScanner?.startScan(null, settings, scan)
+        retry.scheduleWithFixedDelay({
+            synchronized(this) {
+                for (c in active.values) if (c.notifying && !c.busy && c.queue.isEmpty()) enqueue(c, plans.getValue(c.id).retry())
+            }
+        }, 50, 50, java.util.concurrent.TimeUnit.MILLISECONDS)
         say(null, "waiting for ${plans.size} known watch(es), ${auto.size} bonded, scanning")
     }
 
     fun stop(): Unit = synchronized(this) {
         stopped = true
+        retry.shutdownNow()
         runCatching { manager?.adapter?.bluetoothLeScanner?.stopScan(scan) }
         (auto.values + direct.values).forEach { it.disconnect(); it.close() }
         auto.clear(); direct.clear(); active.clear()
@@ -243,6 +252,7 @@ class Rescuer(private val context: Context, private val plans: Map<String, Rescu
         override fun onDescriptorWrite(g: BluetoothGatt, d: BluetoothGattDescriptor, status: Int): Unit = synchronized(this@Rescuer) {
             val c = active[idOf(g.device)]?.takeIf { it.gatt === g } ?: return
             say(c, "notify on")
+            c.notifying = true
             enqueue(c, plans.getValue(c.id).connected())
         }
 

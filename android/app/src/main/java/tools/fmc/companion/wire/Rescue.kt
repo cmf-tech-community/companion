@@ -3,9 +3,13 @@ package tools.fmc.companion.wire
 import java.security.SecureRandom
 
 // Rescue for a watch stuck in a boot loop on a bad face: port of WireKit Rescue.swift (fmc_frontend rescue.model.ts,
-// ble.ts authenticate and factoryReset). Pure: the BLE code calls `connected()` once notifications are on and
-// `notify` for every value on fff1, and writes what they return to fff2 at once. Everything that doesn't depend on the
-// watch's nonce is sealed ahead, before the watch is in range.
+// ble.ts authenticate, fetchInfo's time and factoryReset). Pure: the BLE code calls `connected()` once notifications
+// are on, `retry()` every 50 ms until the watch answers, and `notify` for every value on fff1, and writes what they
+// return to fff2 at once. Everything that doesn't depend on the watch's nonce is sealed ahead.
+//
+// From the cmf-watch-utils emulator (stock 1.0.1.77): the watch drops every write until its own MTU exchange has
+// brought the command service up (~200 ms after the connect), hence the retry; and it ignores 0x009A until a time
+// (0x8004) has set its link flag. A clock more than 2 min off is applied on the second 0x8004 only, so it goes twice.
 //
 // Only a watch this app already holds keys for: the saved authkey (`stock-<id>`), else the pairing secret (`k-<id>`),
 // with which a new bind needs no tap on the watch (the second 0x8049 is answered, cmf-watch-sdk docs/recon.md).
@@ -39,6 +43,10 @@ class RescuePlan private constructor(
     private val secret: ByteArray?,
     private var random1: ByteArray,
 ) {
+    /** The time 0x8004 carries, (unix seconds, zone offset in seconds); a fixed one in the tests. */
+    var clock: () -> Pair<Long, Int> = {
+        System.currentTimeMillis() / 1000 to java.util.TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000
+    }
     /** The authkey in use. A bind replaces it: the caller saves it. */
     var k1: ByteArray? = k1
         private set
@@ -74,6 +82,13 @@ class RescuePlan private constructor(
         }
         phase = Phase.PAIR
         return w(pairFrames, "pair")
+    }
+
+    /** Again what the watch hasn't answered yet: it drops writes until its command service is up. */
+    fun retry(): List<RescueWrite> = when (phase) {
+        Phase.NAME -> w(nameFrames, "authName")
+        Phase.PAIR -> w(pairFrames, "pair")
+        else -> emptyList()
     }
 
     fun notify(uuid: String, value: ByteArray): RescueStep {
@@ -116,13 +131,14 @@ class RescuePlan private constructor(
                 val s = sessionKey(p, k1 ?: return RescueStep())
                 session = s
                 phase = Phase.CONFIRM
-                // the action rides right behind the confirm: commands are handled in order
-                RescueStep(w(stockFrames(StockCmd.AUTH_CONFIRM_REQ, bytes(MARKER), s), "confirm") + actionWrites(s), "004C")
+                // the time and the action ride right behind the confirm: commands are handled in order
+                RescueStep(w(stockFrames(StockCmd.AUTH_CONFIRM_REQ, bytes(MARKER), s), "confirm") + timeWrites(s) +
+                    timeWrites(s) + actionWrites(s), "004C")
             }
             cmd == StockCmd.AUTH_CONFIRM_REP && phase == Phase.CONFIRM -> {
                 phase = Phase.SENT
                 // again on the confirmed session, in case the early one was dropped; a reset that lands twice is one reset
-                RescueStep(actionWrites(session!!), "0004: authenticated", done = action == RescueAction.FactoryReset)
+                RescueStep(timeWrites(session!!) + actionWrites(session!!), "0004: authenticated", done = action == RescueAction.FactoryReset)
             }
             cmd == StockCmd.WF_INSTALLED && (phase == Phase.SENT || phase == Phase.CONFIRM) ->
                 RescueStep(note = "A055 ${p.hex()}", done = true)
@@ -135,6 +151,11 @@ class RescuePlan private constructor(
         prepare()
         phase = Phase.PAIR
         return RescueStep(w(pairFrames, "pair"), note)
+    }
+
+    private fun timeWrites(s: ByteArray): List<RescueWrite> {
+        val (now, tz) = clock()
+        return w(stockFrames(StockCmd.TIME, stockTime(now, tz), s), "time")
     }
 
     private fun actionWrites(s: ByteArray): List<RescueWrite> = when (action) {
@@ -160,6 +181,9 @@ class RescuePlan private constructor(
         }
     }
 }
+
+/** ble.ts fetchInfo's 0x8004: unix seconds ‖ the zone's offset in ms, big endian. */
+fun stockTime(now: Long, tzSeconds: Int) = buf { be32(now); be32(tzSeconds * 1000L and 0xFFFF_FFFFL) }
 
 /** The dials to keep for [RescueAction.KeepDials]: of the list the watch last reported, the stock ones (and the photo
  * face's FFFFFFFF), in order; the first stock one is shown. null when that leaves no stock dial. */

@@ -5,56 +5,55 @@ import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
-import org.json.JSONArray
 import org.json.JSONObject
 
 /** ios RescueTests, on the same rescue-vectors.json (tools/rescue-vectors.ts, from the site's own code). */
 class RescueTest {
     private val v = Vectors.rescue
-    private fun steps(name: String) = v.getJSONArray(name).let { a -> (0 until a.length()).map(a::getJSONObject) }
-    private fun strings(a: JSONArray) = (0 until a.length()).map(a::getString)
     private fun h(key: String) = hex(v.getString(key))
+    private fun w(talk: String, n: String) = v.getJSONObject(talk).getJSONObject("writes").getString(n)
+    private fun feed(p: RescuePlan, talk: String, n: String) =
+        p.notify(Uuid.CMD_NOTIFY, hex(v.getJSONObject(talk).getJSONObject("notifies").getString(n)))
+    private fun hexes(l: List<RescueWrite>) = l.map { it.data.hex() }
 
-    /** Each step's site writes are a prefix of ours, and we write nothing the site doesn't. */
-    private fun replay(plan: RescuePlan, steps: List<JSONObject>): RescueStep {
-        val all = steps.flatMap { strings(it.getJSONArray("writes")) }.toSet()
-        var last = RescueStep()
-        steps.forEachIndexed { i, s ->
-            val ours = if (s.has("notify")) plan.notify(Uuid.CMD_NOTIFY, hex(s.getString("notify"))).also { last = it }.writes
-            else plan.connected()
-            val site = strings(s.getJSONArray("writes"))
-            assertEquals(site, ours.take(site.size).map { it.data.hex() }, "step $i")
-            assertTrue(ours.all { it.data.hex() in all && it.uuid == Uuid.CMD_WRITE }, "step $i")
-        }
-        return last
-    }
+    private fun plan(action: RescueAction = RescueAction.FactoryReset, k1: ByteArray? = h("k1"), secret: ByteArray? = null) =
+        RescuePlan.of(action, k1, secret, h("random1"))!!.apply { clock = { v.getLong("now") to v.getInt("tz_seconds") } }
 
-    @Test fun savedKeyMatchesSite() {
-        val last = replay(RescuePlan.of(RescueAction.FactoryReset, h("k1"), null)!!, steps("known"))
+    /** The site's frames, in the plan's order: the time twice and the reset right behind the confirm, both again on 0x0004. */
+    private fun conversation(p: RescuePlan, t: String) {
+        assertEquals(listOf(w(t, "nonce")), hexes(feed(p, t, "authMac").writes))
+        assertTrue(p.retry().isEmpty())
+        assertEquals(listOf(w(t, "confirm"), w(t, "time"), w(t, "time"), w(t, "factoryReset")), hexes(feed(p, t, "nonceReply").writes))
+        val last = feed(p, t, "confirmReply")
+        assertEquals(listOf(w(t, "time"), w(t, "factoryReset")), hexes(last.writes))
         assertTrue(last.done && !last.refused)
     }
 
-    @Test fun bindsWithSecretWithoutTap() {
-        val plan = RescuePlan.of(RescueAction.FactoryReset, null, h("secret"), h("random1"))!!
-        assertTrue(replay(plan, steps("bind")).done)
-        assertContentEquals(h("bound_k1"), plan.k1)
+    @Test fun savedKeyMatchesSite() {
+        val p = plan()
+        assertEquals(listOf(w("known", "authName")), hexes(p.connected()))
+        // the watch drops writes until its service is up: authName again until it answers
+        assertEquals(listOf(w("known", "authName")), hexes(p.retry()))
+        conversation(p, "known")
     }
 
-    @Test fun resetRidesBehindConfirm() {
-        val plan = RescuePlan.of(RescueAction.FactoryReset, h("k1"), null)!!
-        plan.connected()
-        plan.notify(Uuid.CMD_NOTIFY, hex(steps("known")[1].getString("notify")))
-        val w = plan.notify(Uuid.CMD_NOTIFY, hex(steps("known")[2].getString("notify"))).writes.map { it.what }
-        assertEquals(listOf("confirm", "factoryReset"), w)
+    @Test fun bindsWithSecretWithoutTap() {
+        val p = plan(k1 = null, secret = h("secret"))
+        assertEquals(listOf(w("bind", "pair")), hexes(p.connected()))
+        assertEquals(listOf(w("bind", "pair")), hexes(p.retry()))
+        // the first authName after a bind opens the popup, the second is answered: two, no tap
+        assertEquals(List(2) { w("bind", "authName") }, hexes(feed(p, "bind", "pairReply").writes))
+        assertContentEquals(h("bound_k1"), p.k1)
+        conversation(p, "bind")
     }
 
     @Test fun staleKeyFallsBackToSecret() {
         val failed = stockFrames(StockCmd.AUTH_FAILED, bytes(1, 2), null)[0]
-        val plan = RescuePlan.of(RescueAction.FactoryReset, h("k1"), h("secret"), h("random1"))!!
-        plan.connected()
-        val s = plan.notify(Uuid.CMD_NOTIFY, failed)
-        assertTrue(s.writes.map { it.what } == listOf("pair") && !s.refused && plan.k1 == null)
-        val only = RescuePlan.of(RescueAction.FactoryReset, h("k1"), null)!!
+        val p = plan(secret = h("secret"))
+        p.connected()
+        val s = p.notify(Uuid.CMD_NOTIFY, failed)
+        assertTrue(s.writes.map { it.what } == listOf("pair") && !s.refused && p.k1 == null)
+        val only = plan()
         only.connected()
         assertTrue(only.notify(Uuid.CMD_NOTIFY, failed).refused)
     }
@@ -62,13 +61,14 @@ class RescueTest {
     @Test fun needsAKey() = assertNull(RescuePlan.of(RescueAction.FactoryReset, null, null))
 
     @Test fun keepDialsMatchesSiteCodec() {
-        val k = v.getJSONObject("keep_dials")
+        val k: JSONObject = v.getJSONObject("keep_dials")
         val ids = k.getJSONArray("ids").let { a -> (0 until a.length()).map(a::getLong) }
-        val plan = RescuePlan.of(RescueAction.KeepDials(ids, k.getInt("active")), h("k1"), null)!!
-        plan.connected()
-        plan.notify(Uuid.CMD_NOTIFY, hex(steps("known")[1].getString("notify")))
-        val w = plan.notify(Uuid.CMD_NOTIFY, hex(steps("known")[2].getString("notify"))).writes.filter { it.what == "keepDials" }
-        assertEquals(strings(k.getJSONArray("frames")), w.map { it.data.hex() })
+        val p = plan(RescueAction.KeepDials(ids, k.getInt("active")))
+        p.connected()
+        feed(p, "known", "authMac")
+        val got = feed(p, "known", "nonceReply").writes.filter { it.what == "keepDials" }
+        val frames = k.getJSONArray("frames").let { a -> (0 until a.length()).map(a::getString) }
+        assertEquals(frames, hexes(got))
     }
 
     @Test fun keepsStockDials() {

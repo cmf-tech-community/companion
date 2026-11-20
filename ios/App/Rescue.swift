@@ -92,6 +92,8 @@ final class Rescuer: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate, @
     private var writeChar: [UUID: CBCharacteristic] = [:]
     private var connectedAt: [UUID: UInt64] = [:]
     private var advSeen: Set<UUID> = []
+    /// Repeats what the watch hasn't answered every 50 ms: it drops writes until its command service is up.
+    private var retry: DispatchSourceTimer?
     private var stopped = false
     private let started = DispatchTime.now().uptimeNanoseconds
     private let emit: (Event) -> Void
@@ -105,6 +107,7 @@ final class Rescuer: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate, @
     func stop() {
         queue.async { [self] in
             stopped = true
+            retry?.cancel()
             if central.state == .poweredOn { central.stopScan() }
         }
         // writes without response still queued go out before the link is cut
@@ -198,6 +201,19 @@ final class Rescuer: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate, @
         let writes = plan.connected()
         plans[p.identifier] = plan
         send(p, writes)
+        if retry == nil {
+            let t = DispatchSource.makeTimerSource(queue: queue)
+            t.schedule(deadline: .now() + .milliseconds(50), repeating: .milliseconds(50))
+            t.setEventHandler { [weak self] in self?.again() }
+            t.resume()
+            retry = t
+        }
+    }
+
+    private func again() {
+        for (id, p) in peripherals where p.state == .connected && writeChar[id] != nil {
+            if let w = plans[id]?.retry(), !w.isEmpty { send(p, w) }
+        }
     }
 
     func peripheral(_ p: CBPeripheral, didUpdateValueFor c: CBCharacteristic, error: Error?) {
