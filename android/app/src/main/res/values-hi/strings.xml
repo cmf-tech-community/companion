@@ -264,4 +264,28 @@
         <item quantity="one">घड़ी की मेमोरी में फ़ेस फ़िट करने के लिए %1$d इमेज कंप्रेस की गई। घड़ी पर वह थोड़ी धुंधली दिख सकती है।</item>
         <item quantity="other">घड़ी की मेमोरी में फ़ेस फ़िट करने के लिए %1$d इमेज कंप्रेस की गईं। घड़ी पर वे थोड़ी धुंधली दिख सकती हैं।</item>
     </plurals>
+    <!-- Rescue a stuck watch -->
+    <string name="rescue_title">अटकी हुई घड़ी ठीक करें</string>
+    <string name="rescue_intro">उस घड़ी के लिए जो किसी वॉच फ़ेस के बाद बार-बार रीस्टार्ट होती है। फ़ोन घड़ी का इंतज़ार करता है और हर रीस्टार्ट पर जैसे ही हो सके एक कमांड भेजता है, जब तक वह पहुँच न जाए।</string>
+    <string name="rescue_no_key_title">इस फ़ोन में आपकी घड़ी की कुंजी नहीं है</string>
+    <string name="rescue_no_key">बचाव के लिए वह कुंजी चाहिए जो यह ऐप पहली बार घड़ी पढ़ते या फ़ेस इंस्टॉल करते समय सहेजता है। उसके बिना घड़ी अपनी स्क्रीन पर पुष्टि माँगेगी, जो अटकी हुई घड़ी नहीं दिखा सकती। वह फ़ोन आज़माएँ जिससे फ़ेस इंस्टॉल हुआ था, या उस ब्राउज़र में fmc.tools का रेस्क्यू पेज जिससे वह इंस्टॉल हुआ था।</string>
+    <string name="rescue_reset">फ़ैक्टरी रीसेट</string>
+    <string name="rescue_remove_faces">कस्टम फ़ेस हटाएँ</string>
+    <string name="rescue_remove_footer">सिर्फ़ वे बिल्ट-इन फ़ेस रखता है जो घड़ी ने पिछली बार बताए थे, और पहला दिखाता है। आपका डेटा रहता है। अटकी हुई घड़ी पर अभी आज़माया नहीं गया।</string>
+    <string name="rescue_reset_footer">घड़ी पर सब कुछ मिटाकर उसे रीस्टार्ट करता है।</string>
+    <string name="rescue_stop">रोकें</string>
+    <string name="rescue_keep_open">यह स्क्रीन खुली रखें और फ़ोन घड़ी के पास रखें।</string>
+    <string name="rescue_log">लॉग</string>
+    <string name="rescue_copy_log">लॉग कॉपी करें</string>
+    <string name="rescue_remove_title">कस्टम फ़ेस हटाएँ?</string>
+    <string name="rescue_erase_title">घड़ी मिटाएँ?</string>
+    <string name="rescue_remove">हटाएँ</string>
+    <string name="rescue_erase">मिटाएँ</string>
+    <string name="rescue_remove_text">घड़ी पर सिर्फ़ उसके बिल्ट-इन फ़ेस रहेंगे।</string>
+    <string name="rescue_erase_text">घड़ी का सारा डेटा मिट जाएगा। इसे वापस नहीं किया जा सकता।</string>
+    <string name="rescue_waiting">घड़ी का इंतज़ार…</string>
+    <string name="rescue_connected">कनेक्ट हुआ, भेज रहे हैं…</string>
+    <string name="rescue_sent">भेज दिया। घड़ी साफ़ रीस्टार्ट होनी चाहिए। अगर वह अब भी बार-बार रीस्टार्ट हो, तो फिर से शुरू करें।</string>
+    <string name="rescue_done">हो गया। घड़ी पर सिर्फ़ बिल्ट-इन फ़ेस रहे।</string>
+    <string name="rescue_refused">घड़ी ने इस ऐप की कुंजी अस्वीकार कर दी: तब से उसे फिर से पेयर किया गया है। घड़ी पर पुष्टि के बिना बचाव आगे नहीं बढ़ सकता।</string>
 </resources>

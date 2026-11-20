@@ -6379,6 +6379,622 @@
     },
     "—" : {
       "shouldTranslate" : false
+    },
+    "Rescue a stuck watch" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Спасти зависшие часы"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Врятувати завислий годинник"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rescatar un reloj bloqueado"
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "अटकी हुई घड़ी ठीक करें"
+          }
+        }
+      }
+    },
+    "For a watch that restarts over and over after a watch face. The phone waits for the watch and sends one command the moment it can, on every restart, until it lands." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Для часов, которые раз за разом перезагружаются после циферблата. Телефон ждёт часы и при каждой перезагрузке отправляет одну команду, как только это возможно, пока она не дойдёт."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Для годинника, який раз у раз перезавантажується після циферблата. Телефон чекає на годинник і під час кожного перезавантаження надсилає одну команду, щойно це можливо, поки вона не дійде."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para un reloj que se reinicia una y otra vez tras instalar una esfera. El teléfono espera al reloj y, en cada reinicio, envía un comando en cuanto puede, hasta que llega."
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "उस घड़ी के लिए जो किसी वॉच फ़ेस के बाद बार-बार रीस्टार्ट होती है। फ़ोन घड़ी का इंतज़ार करता है और हर रीस्टार्ट पर जैसे ही हो सके एक कमांड भेजता है, जब तक वह पहुँच न जाए।"
+          }
+        }
+      }
+    },
+    "This phone has no key for your watch" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "На этом телефоне нет ключа от ваших часов"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "На цьому телефоні немає ключа від вашого годинника"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este teléfono no tiene la clave de tu reloj"
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "इस फ़ोन में आपकी घड़ी की कुंजी नहीं है"
+          }
+        }
+      }
+    },
+    "Rescue needs the key this app saves the first time it reads the watch or installs a face. Without it the watch would ask for a confirmation on its screen, which a stuck watch can't show. Try the phone that installed the face, or the fmc.tools rescue page in the browser that installed it." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Для спасения нужен ключ, который приложение сохраняет, когда впервые читает часы или ставит циферблат. Без него часы попросили бы подтверждение на экране, а зависшие часы его не покажут. Попробуйте с телефона, с которого ставили циферблат, или на странице спасения fmc.tools в браузере, из которого его ставили."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Для порятунку потрібен ключ, який застосунок зберігає, коли вперше читає годинник або встановлює циферблат. Без нього годинник попросив би підтвердження на екрані, а завислий годинник його не покаже. Спробуйте з телефона, з якого встановлювали циферблат, або на сторінці порятунку fmc.tools у браузері, з якого його встановлювали."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El rescate necesita la clave que la app guarda la primera vez que lee el reloj o instala una esfera. Sin ella, el reloj pediría una confirmación en pantalla, y un reloj bloqueado no puede mostrarla. Prueba con el teléfono que instaló la esfera o con la página de rescate de fmc.tools en el navegador que la instaló."
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "बचाव के लिए वह कुंजी चाहिए जो यह ऐप पहली बार घड़ी पढ़ते या फ़ेस इंस्टॉल करते समय सहेजता है। उसके बिना घड़ी अपनी स्क्रीन पर पुष्टि माँगेगी, जो अटकी हुई घड़ी नहीं दिखा सकती। वह फ़ोन आज़माएँ जिससे फ़ेस इंस्टॉल हुआ था, या उस ब्राउज़र में fmc.tools का रेस्क्यू पेज जिससे वह इंस्टॉल हुआ था।"
+          }
+        }
+      }
+    },
+    "Action" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Действие"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дія"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acción"
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "कार्रवाई"
+          }
+        }
+      }
+    },
+    "Factory reset" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сброс к заводским настройкам"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скидання до заводських налаштувань"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restablecer de fábrica"
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "फ़ैक्टरी रीसेट"
+          }
+        }
+      }
+    },
+    "Remove custom faces" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Убрать свои циферблаты"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Прибрати власні циферблати"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quitar esferas personalizadas"
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "कस्टम फ़ेस हटाएँ"
+          }
+        }
+      }
+    },
+    "Keeps only the built-in faces the watch last reported and shows the first one. Your data stays. Not yet tried on a stuck watch." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Оставляет только встроенные циферблаты из последнего списка часов и включает первый. Данные остаются. На зависших часах ещё не проверено."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Залишає лише вбудовані циферблати з останнього списку годинника й вмикає перший. Дані лишаються. На завислому годиннику ще не перевірено."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deja solo las esferas integradas que el reloj indicó la última vez y muestra la primera. Tus datos se mantienen. Aún no probado en un reloj bloqueado."
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "सिर्फ़ वे बिल्ट-इन फ़ेस रखता है जो घड़ी ने पिछली बार बताए थे, और पहला दिखाता है। आपका डेटा रहता है। अटकी हुई घड़ी पर अभी आज़माया नहीं गया।"
+          }
+        }
+      }
+    },
+    "Erases everything on the watch and restarts it." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Стирает всё на часах и перезагружает их."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Стирає все на годиннику й перезавантажує його."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Borra todo lo que hay en el reloj y lo reinicia."
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "घड़ी पर सब कुछ मिटाकर उसे रीस्टार्ट करता है।"
+          }
+        }
+      }
+    },
+    "Keep this screen open and the phone next to the watch." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не закрывайте этот экран и держите телефон рядом с часами."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не закривайте цей екран і тримайте телефон поруч із годинником."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantén esta pantalla abierta y el teléfono junto al reloj."
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "यह स्क्रीन खुली रखें और फ़ोन घड़ी के पास रखें।"
+          }
+        }
+      }
+    },
+    "Copy log" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скопировать журнал"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скопіювати журнал"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar registro"
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "लॉग कॉपी करें"
+          }
+        }
+      }
+    },
+    "Remove the custom faces?" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Убрать свои циферблаты?"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Прибрати власні циферблати?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Quitar las esferas personalizadas?"
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "कस्टम फ़ेस हटाएँ?"
+          }
+        }
+      }
+    },
+    "Erase the watch?" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Стереть часы?"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Стерти годинник?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Borrar el reloj?"
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "घड़ी मिटाएँ?"
+          }
+        }
+      }
+    },
+    "Remove" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Убрать"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Прибрати"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quitar"
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "हटाएँ"
+          }
+        }
+      }
+    },
+    "Erase" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Стереть"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Стерти"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Borrar"
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "मिटाएँ"
+          }
+        }
+      }
+    },
+    "The watch keeps only its built-in faces." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "На часах останутся только встроенные циферблаты."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "На годиннику залишаться лише вбудовані циферблати."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El reloj conserva solo sus esferas integradas."
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "घड़ी पर सिर्फ़ उसके बिल्ट-इन फ़ेस रहेंगे।"
+          }
+        }
+      }
+    },
+    "All data on the watch is erased. This can't be undone." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Все данные на часах будут стёрты. Это нельзя отменить."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Усі дані на годиннику буде стерто. Це не можна скасувати."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se borrarán todos los datos del reloj. No se puede deshacer."
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "घड़ी का सारा डेटा मिट जाएगा। इसे वापस नहीं किया जा सकता।"
+          }
+        }
+      }
+    },
+    "Waiting for the watch…" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ждём часы…"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Чекаємо на годинник…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esperando al reloj…"
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "घड़ी का इंतज़ार…"
+          }
+        }
+      }
+    },
+    "Connected, sending…" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подключено, отправляем…"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Підключено, надсилаємо…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conectado, enviando…"
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "कनेक्ट हुआ, भेज रहे हैं…"
+          }
+        }
+      }
+    },
+    "Sent. The watch should restart clean. If it still restarts in a loop, start again." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отправлено. Часы должны перезагрузиться начисто. Если они всё ещё перезагружаются по кругу, запустите снова."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Надіслано. Годинник має перезавантажитися начисто. Якщо він досі перезавантажується по колу, запустіть знову."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviado. El reloj debería reiniciarse limpio. Si sigue reiniciándose en bucle, vuelve a empezar."
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "भेज दिया। घड़ी साफ़ रीस्टार्ट होनी चाहिए। अगर वह अब भी बार-बार रीस्टार्ट हो, तो फिर से शुरू करें।"
+          }
+        }
+      }
+    },
+    "Done. The watch kept only its built-in faces." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Готово. На часах остались только встроенные циферблаты."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Готово. На годиннику залишилися лише вбудовані циферблати."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Listo. El reloj conservó solo sus esferas integradas."
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "हो गया। घड़ी पर सिर्फ़ बिल्ट-इन फ़ेस रहे।"
+          }
+        }
+      }
+    },
+    "The watch refused the key this app has: it was paired again since. Rescue can't go on without a confirmation on the watch." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Часы отклонили ключ, который есть у приложения: с тех пор их привязали заново. Без подтверждения на часах спасение невозможно."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Годинник відхилив ключ, який має застосунок: відтоді його прив’язали знову. Без підтвердження на годиннику порятунок неможливий."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El reloj rechazó la clave que tiene la app: se volvió a vincular desde entonces. El rescate no puede seguir sin una confirmación en el reloj."
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "घड़ी ने इस ऐप की कुंजी अस्वीकार कर दी: तब से उसे फिर से पेयर किया गया है। घड़ी पर पुष्टि के बिना बचाव आगे नहीं बढ़ सकता।"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

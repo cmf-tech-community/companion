@@ -40,6 +40,9 @@ class SecureStore(context: Context) {
         }.getOrNull()
     }
 
+    /** Every name stored (the per-watch keys are `k-<watch id>` and `stock-<watch id>`). */
+    fun names(): Set<String> = prefs.all.keys
+
     operator fun set(name: String, value: String?) {
         if (value == null) return prefs.edit().remove(name).apply()
         val c = Cipher.getInstance(MODE).apply { init(Cipher.ENCRYPT_MODE, key) }

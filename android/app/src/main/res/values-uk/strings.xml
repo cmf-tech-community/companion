@@ -274,4 +274,28 @@
         <item quantity="many">%1$d зображень стиснуто, щоб циферблат помістився в пам\'ять годинника. На годиннику вони можуть виглядати трохи м\'якше.</item>
         <item quantity="other">%1$d зображення стиснуто, щоб циферблат помістився в пам\'ять годинника. На годиннику вони можуть виглядати трохи м\'якше.</item>
     </plurals>
+    <!-- Rescue a stuck watch -->
+    <string name="rescue_title">Врятувати завислий годинник</string>
+    <string name="rescue_intro">Для годинника, який раз у раз перезавантажується після циферблата. Телефон чекає на годинник і під час кожного перезавантаження надсилає одну команду, щойно це можливо, поки вона не дійде.</string>
+    <string name="rescue_no_key_title">На цьому телефоні немає ключа від вашого годинника</string>
+    <string name="rescue_no_key">Для порятунку потрібен ключ, який застосунок зберігає, коли вперше читає годинник або встановлює циферблат. Без нього годинник попросив би підтвердження на екрані, а завислий годинник його не покаже. Спробуйте з телефона, з якого встановлювали циферблат, або на сторінці порятунку fmc.tools у браузері, з якого його встановлювали.</string>
+    <string name="rescue_reset">Скидання до заводських налаштувань</string>
+    <string name="rescue_remove_faces">Прибрати власні циферблати</string>
+    <string name="rescue_remove_footer">Залишає лише вбудовані циферблати з останнього списку годинника й вмикає перший. Дані лишаються. На завислому годиннику ще не перевірено.</string>
+    <string name="rescue_reset_footer">Стирає все на годиннику й перезавантажує його.</string>
+    <string name="rescue_stop">Зупинити</string>
+    <string name="rescue_keep_open">Не закривайте цей екран і тримайте телефон поруч із годинником.</string>
+    <string name="rescue_log">Журнал</string>
+    <string name="rescue_copy_log">Скопіювати журнал</string>
+    <string name="rescue_remove_title">Прибрати власні циферблати?</string>
+    <string name="rescue_erase_title">Стерти годинник?</string>
+    <string name="rescue_remove">Прибрати</string>
+    <string name="rescue_erase">Стерти</string>
+    <string name="rescue_remove_text">На годиннику залишаться лише вбудовані циферблати.</string>
+    <string name="rescue_erase_text">Усі дані на годиннику буде стерто. Це не можна скасувати.</string>
+    <string name="rescue_waiting">Чекаємо на годинник…</string>
+    <string name="rescue_connected">Підключено, надсилаємо…</string>
+    <string name="rescue_sent">Надіслано. Годинник має перезавантажитися начисто. Якщо він досі перезавантажується по колу, запустіть знову.</string>
+    <string name="rescue_done">Готово. На годиннику залишилися лише вбудовані циферблати.</string>
+    <string name="rescue_refused">Годинник відхилив ключ, який має застосунок: відтоді його прив’язали знову. Без підтвердження на годиннику порятунок неможливий.</string>
 </resources>

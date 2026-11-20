@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0427B7BFF37722600D98BD37 /* Rescue.swift in Sources */ = {isa = PBXBuildFile; fileRef = F90CF751F2B744811AF6461E /* Rescue.swift */; };
 		0747FEE0D73E850B42F007EA /* DevLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BE3FC0819E9791F8B4262D5 /* DevLog.swift */; };
 		0AD67CDEC9F904D2ADD95084 /* CatalogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 959119DD04DE62417C85273A /* CatalogView.swift */; };
 		1076436FDFC947C41B97C816 /* WireKit in Frameworks */ = {isa = PBXBuildFile; productRef = DCBA60A6C6635A5AAC71E3C7 /* WireKit */; };
@@ -74,6 +75,7 @@
 		EBDB494304C4E1BAB57D9494 /* Analytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Analytics.swift; sourceTree = "<group>"; };
 		EF3BB6347F0B47FDA2BACB52 /* WatchModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchModel.swift; sourceTree = "<group>"; };
 		F7CE9B33B6B174A1EF287F66 /* BLELink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLELink.swift; sourceTree = "<group>"; };
+		F90CF751F2B744811AF6461E /* Rescue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rescue.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -120,6 +122,7 @@
 				1D54B42BE6C7586EF4AEFC81 /* Localizable.xcstrings */,
 				DA49EF6F02E958F9DAF1FB07 /* Permissions.swift */,
 				A30DA1CDE26DDC84EF3446F4 /* PhoneServices.swift */,
+				F90CF751F2B744811AF6461E /* Rescue.swift */,
 				2BC5DDCA55F73C76DE5A0A1A /* RPCListener.swift */,
 				49774F9C3C84BAA91D96604A /* stock-dials.json */,
 				9011709E9E31B2E83D046922 /* Style.swift */,
@@ -281,6 +284,7 @@
 				3B5D6A2DE0ED5040C869738E /* Permissions.swift in Sources */,
 				38ABB8F0262BB680D34A9295 /* PhoneServices.swift in Sources */,
 				1D80FB73F6798157FE257CD1 /* RPCListener.swift in Sources */,
+				0427B7BFF37722600D98BD37 /* Rescue.swift in Sources */,
 				FF739CBC1BF6E89E4B6C94AE /* Style.swift in Sources */,
 				EED6A58529E6B025F772E522 /* WakeProbe.swift in Sources */,
 				5E95CBA89634EBA843284AE0 /* WatchModel.swift in Sources */,

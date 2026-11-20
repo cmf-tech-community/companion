@@ -20,6 +20,15 @@ enum Keychain {
         SecItemAdd(q as CFDictionary, nil)
     }
 
+    /// Every account this app keeps (the per-watch keys are `k-<id>` and `stock-<id>`).
+    static func accounts() -> [String] {
+        var out: AnyObject?
+        let q: [String: Any] = [kSecClass as String: kSecClassGenericPassword, kSecAttrService as String: "tools.fmc.companion",
+                                kSecMatchLimit as String: kSecMatchLimitAll, kSecReturnAttributes as String: true]
+        guard SecItemCopyMatching(q as CFDictionary, &out) == errSecSuccess, let items = out as? [[String: Any]] else { return [] }
+        return items.compactMap { $0[kSecAttrAccount as String] as? String }
+    }
+
     private static func query(_ account: String) -> [String: Any] {
         [kSecClass as String: kSecClassGenericPassword, kSecAttrService as String: "tools.fmc.companion",
          kSecAttrAccount as String: account]
