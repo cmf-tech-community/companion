@@ -84,3 +84,26 @@ A real stuck Watch 3 Pro, in the site's rescue page in desktop Chrome, stayed li
 4.1 s and discovery 0.9 s, so its host answered ATT for at least that long: hardware has much longer windows than the
 emulator (the users' alarm and calendar reminder say the same). Whether one is long enough for auth, the time and the
 reset is what the first field log will show.
+
+## The shell (Android only)
+
+Watch tab › Rescue › Switch to a stock face, on Android, needs no key and erases nothing (`ShellRescue.kt`; the
+fmc.tools `/rescue` button of the same name is `Watch.shellBlast` in fmc_frontend). On fw 1.0.1.77 the face list lives
+in RAM that outlives the crash reboot: `WfmPara_Load` reads it at `0x3800f73a` behind a magic. The shell
+characteristic (`77d4ff01`, handle 62) takes the full Zephyr shell with no auth, so `dbg mwb 0x3800f73a 0` breaks
+the magic and the next boot rebuilds the list from the stock faces alone (`WFM _REST`). The face's file stays.
+From a raw-HCI central that writes from the first instant of the link, this got a looping emulator out
+(cmf-watch-utils `runs/wp3/rescue`, run `mw3`).
+
+- The write goes before any discovery: a characteristic made by hand, with its instance id (the ATT handle) and its
+  service's device set by reflection (works on Android 16; logged when hidden). Write Without Response every 15 ms
+  for 1.5 s, then a discovery and `AT GETVERSION`: only a watch that stopped looping answers.
+- The scan only finds the watch; a direct connect is then always pending, re-armed after every drop, so the link
+  comes up on the first advertisement after a restart (an Android emulator: ~250 ms after it, against ~400 ms more
+  when opened on a scan result). `CONNECTION_PRIORITY_HIGH` right after.
+- What stops it in the emulator: the Android stack itself. The watch supports robust caching, so on every connect
+  the stack reads its Database Hash and, with no cache to match, runs a full discovery (~25 ATT exchanges), and every
+  write of the app queues behind it (`bta_gattc_enqueue: Already has a pending command`). In the emulator's loop
+  that discovery ends with the fault, and no write gets out; dropping the cache (`refresh()`) only makes the stack
+  discover every time. It is shipped for real hardware, whose windows can be longer (above).
+- iOS can't do it: CoreBluetooth writes only to a discovered characteristic.

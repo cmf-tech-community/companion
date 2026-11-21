@@ -76,6 +76,7 @@ object RescueModel {
         private set
     val log = mutableStateListOf<String>()
     private var rescuer: Rescuer? = null
+    private var shell: ShellRescuer? = null
     val running get() = phase == Phase.WAITING || phase == Phase.CONNECTED
 
     /** Watch ids (sha256 of the address, 16 hex) this app holds a key for. */
@@ -101,9 +102,18 @@ object RescueModel {
         rescuer = Rescuer(context.applicationContext, plans) { e -> appMain { handle(store, e) } }.also { it.start() }
     }
 
+    /** The keyless way (ShellRescue.kt): any Watch 3 Pro, no key, nothing erased. */
+    fun startShell(context: Context, store: SecureStore) {
+        log.clear()
+        phase = Phase.WAITING
+        shell = ShellRescuer(context.applicationContext) { e -> appMain { handle(store, e) } }.also { it.start() }
+    }
+
     fun stop() {
         rescuer?.stop()
         rescuer = null
+        shell?.stop()
+        shell = null
         if (running) phase = Phase.IDLE
     }
 
@@ -334,6 +344,7 @@ fun RescueScreen(store: SecureStore, back: () -> Unit) {
     val start = withBluetooth {
         m.start(context, store, if (removeFaces && keep != null) keep else RescueAction.FactoryReset)
     }
+    val startShell = withBluetooth { m.startShell(context, store) }
     if (confirming) AlertDialog(
         onDismissRequest = { confirming = false },
         title = { Text(stringResource(if (removeFaces) R.string.rescue_remove_title else R.string.rescue_erase_title)) },
@@ -349,6 +360,13 @@ fun RescueScreen(store: SecureStore, back: () -> Unit) {
         Bar(stringResource(R.string.rescue_title), back)
         LazyColumn {
             item { Section { Text(stringResource(R.string.rescue_intro)) } }
+            // needs no key, so it is there for every watch, above the keyed ways
+            item {
+                Section(footer = stringResource(R.string.rescue_shell_footer)) {
+                    if (m.running) OutlinedButton({ m.stop() }, Modifier.fillMaxWidth()) { Text(stringResource(R.string.rescue_stop)) }
+                    else Button({ startShell() }, Modifier.fillMaxWidth()) { Text(stringResource(R.string.rescue_shell)) }
+                }
+            }
             if (known.isEmpty()) item {
                 Section {
                     Text(stringResource(R.string.rescue_no_key_title), fontWeight = FontWeight.SemiBold)

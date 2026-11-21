@@ -285,6 +285,8 @@
     <string name="rescue_remove_faces">Remove custom faces</string>
     <string name="rescue_remove_footer">Keeps only the built-in faces the watch last reported and shows the first one. Your data stays. Not yet tried on a stuck watch.</string>
     <string name="rescue_reset_footer">Erases everything on the watch and restarts it.</string>
+    <string name="rescue_shell">Switch to a stock face (Watch 3 Pro)</string>
+    <string name="rescue_shell_footer">For a Watch 3 Pro on firmware 1.0.1.77: the watch forgets its installed faces and starts on a built-in one. No key needed, nothing is erased. Not yet confirmed on a real watch: keep this screen open and the phone next to the watch for a few minutes, then copy the log.</string>
     <string name="rescue_stop">Stop</string>
     <string name="rescue_keep_open">Keep this screen open and the phone next to the watch.</string>
     <string name="rescue_log">Log</string>

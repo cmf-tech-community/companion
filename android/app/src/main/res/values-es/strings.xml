@@ -277,6 +277,8 @@
     <string name="rescue_remove_faces">Quitar esferas personalizadas</string>
     <string name="rescue_remove_footer">Deja solo las esferas integradas que el reloj indicó la última vez y muestra la primera. Tus datos se mantienen. Aún no probado en un reloj bloqueado.</string>
     <string name="rescue_reset_footer">Borra todo lo que hay en el reloj y lo reinicia.</string>
+    <string name="rescue_shell">Cambiar a una esfera integrada (Watch 3 Pro)</string>
+    <string name="rescue_shell_footer">Para un Watch 3 Pro con firmware 1.0.1.77: el reloj olvida las esferas instaladas y arranca con una integrada. No hace falta clave y no se borra nada. Aún sin confirmar en un reloj real: deja esta pantalla abierta y el teléfono junto al reloj unos minutos, luego copia el registro.</string>
     <string name="rescue_stop">Detener</string>
     <string name="rescue_keep_open">Mantén esta pantalla abierta y el teléfono junto al reloj.</string>
     <string name="rescue_log">Registro</string>
