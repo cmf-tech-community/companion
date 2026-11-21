@@ -273,6 +273,8 @@
     <string name="rescue_remove_faces">कस्टम फ़ेस हटाएँ</string>
     <string name="rescue_remove_footer">सिर्फ़ वे बिल्ट-इन फ़ेस रखता है जो घड़ी ने पिछली बार बताए थे, और पहला दिखाता है। आपका डेटा रहता है। अटकी हुई घड़ी पर अभी आज़माया नहीं गया।</string>
     <string name="rescue_reset_footer">घड़ी पर सब कुछ मिटाकर उसे रीस्टार्ट करता है।</string>
+    <string name="rescue_shell">बिल्ट-इन फ़ेस पर स्विच करें (Watch 3 Pro)</string>
+    <string name="rescue_shell_footer">फ़र्मवेयर 1.0.1.77 वाले Watch 3 Pro के लिए: घड़ी इंस्टॉल किए गए फ़ेस भूल जाती है और बिल्ट-इन फ़ेस से शुरू होती है। कुंजी की ज़रूरत नहीं, कुछ भी मिटता नहीं। असली घड़ी पर अभी पुष्टि नहीं हुई: यह स्क्रीन खुली रखें और फ़ोन को कुछ मिनट घड़ी के पास रखें, फिर लॉग कॉपी करें।</string>
     <string name="rescue_stop">रोकें</string>
     <string name="rescue_keep_open">यह स्क्रीन खुली रखें और फ़ोन घड़ी के पास रखें।</string>
     <string name="rescue_log">लॉग</string>
